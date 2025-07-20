@@ -1,11 +1,15 @@
 import { View, StyleSheet } from 'react-native'
 import TileBlock from '../components/TileBlock'
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 
-export default function MainMenu() {
+type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
+
+export default function MainMenu({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.row}>
-        <TileBlock title="Start Session" onPress={() => {}} style={{ backgroundColor: '#6C8EBF' }} />
+        <TileBlock title="Start Session" onPress={() => navigation.navigate('Session')} style={{ backgroundColor: '#6C8EBF' }} />
         <TileBlock title="Calendar" onPress={() => {}} style={{ backgroundColor: '#7FB77E' }} />
       </View>
       <View style={styles.row}>
