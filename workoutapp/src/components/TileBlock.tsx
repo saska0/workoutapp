@@ -8,7 +8,10 @@ type TileBlockProps = {
 
 export default function TileBlock({ title, onPress, style }: TileBlockProps) {
   return (
-    <Pressable onPress={onPress} style={[styles.tile, style]}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.tile, style, pressed && styles.pressed]}
+    >
       <Text style={styles.title}>{title}</Text>
     </Pressable>
   )
@@ -25,8 +28,11 @@ const styles = StyleSheet.create({
     margin: 5,
     minHeight: 140,
   },
+  pressed: {
+    opacity: 0.7,
+  },
   title: {
-    color: '#111111',
+    color: '#fff',
     fontSize: 18,
     fontWeight: '600',
   },

@@ -21,4 +21,14 @@ router.post('/', async (req, res) => {
   }
 });
 
+router.get('/', async (_req, res) => {
+  try {
+    const templates = await WorkoutSequenceTemplate.find();
+    res.json(templates);
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    res.status(500).json({ error: 'Failed to fetch templates' });
+  }
+});
+
 export default router;

@@ -34,8 +34,11 @@ export default function SessionScreen({ navigation }: Props) {
       
       <ScrollView style={styles.scrollView}>
         <View style={styles.row}>
-          <TileBlock title="Stretch 1" onPress={() => console.log('Stretch 1')} style={{ backgroundColor: '#6C8EBF' }} />
-          <TileBlock title="Stretch 2" onPress={() => console.log('Stretch 2')} style={{ backgroundColor: '#7FB77E' }} />
+          <TileBlock title="Stretch 1" onPress={() => console.log('Stretch 1')} style={styles.tileBlock} />
+          <TileBlock title="Stretch 2" onPress={() => console.log('Stretch 2')} style={styles.tileBlock} />
+        </View>
+        <View style={styles.row}>
+          <TileBlock title="Edit" onPress={() => navigation.navigate('EditMenu')} style={styles.tileBlock} />
         </View>
         <View style={styles.row}>
           <TileBlock
@@ -44,7 +47,7 @@ export default function SessionScreen({ navigation }: Props) {
               endSession();
               navigation.navigate('Main');
             }}
-            style={{ backgroundColor: '#e74a3b' }}
+            style={styles.endSessionTile}
           />
         </View>
       </ScrollView>
@@ -71,5 +74,11 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  tileBlock: {
+    backgroundColor: '#222',
+  },
+  endSessionTile: {
+    backgroundColor: '#e74a3b',
   },
 });

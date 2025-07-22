@@ -5,11 +5,14 @@ import { StyleSheet, View } from 'react-native';
 import MainMenu from './src/screens/MainMenu';
 import SessionScreen from './src/screens/Session';
 import { RootStackParamList } from './src/types/navigation';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import EditMenu from '@screens/EditMenu';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
+    <GestureHandlerRootView>
     <SessionTimerProvider>
       <View style={styles.container}>
         <NavigationContainer>
@@ -32,10 +35,20 @@ export default function App() {
                 animation: 'slide_from_bottom',
               }} 
             />
+            <Stack.Screen 
+              name="EditMenu" 
+              component={EditMenu} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_bottom',
+              }} 
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </View> 
     </SessionTimerProvider>
+    </GestureHandlerRootView>
   );
 }
 
