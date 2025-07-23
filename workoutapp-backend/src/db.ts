@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI;
-
+const MONGODB_URI = process.env.NODE_ENV === 'test' 
+  ? process.env.TEST_MONGODB_URI
+  : process.env.MONGODB_URI
+console.log(MONGODB_URI);
 export const connectToDatabase = async () => {
   try {
     await mongoose.connect(MONGODB_URI as string);
