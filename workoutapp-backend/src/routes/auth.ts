@@ -26,6 +26,21 @@ router.post('/register', async (req: Request<{}, {}, RegisterRequestBody>, res: 
       return;
     }
 
+    if (username.length < 3) {
+      res.status(400).json({ message: 'Username must be at least 3 characters long.' });
+      return;
+    }
+
+    if (username.length > 12) {
+      res.status(400).json({ message: 'Username must be at most 12 characters long.' });
+      return;
+    }
+
+    if (password.length < 6) {
+      res.status(400).json({ message: 'Password must be at least 6 characters long.' });
+      return;
+    }
+
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       res.status(409).json({ message: 'User already exists.' });

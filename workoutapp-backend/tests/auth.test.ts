@@ -36,6 +36,78 @@ describe('Auth Endpoints', () => {
     expect(res.body).toHaveProperty('message');
   });
 
+  it('should not register with username less than 3 characters', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        username: 'ab', // 2 characters
+        email: 'test@example.com',
+        password: 'testpassword'
+      });
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('message', 'Username must be at least 3 characters long.');
+  });
+
+  it('should not register with password less than 6 characters', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: '12345' // 5 characters
+      });
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('message', 'Password must be at least 6 characters long.');
+  });
+
+  it('should register with username exactly 3 characters', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        username: 'abc', // exactly 3 characters
+        email: 'test@example.com',
+        password: 'testpassword'
+      });
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toHaveProperty('message', 'User registered successfully.');
+  });
+
+  it('should not register with username more than 12 characters', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        username: 'thisusernameiswaytoolong',
+        email: 'test@example.com',
+        password: 'testpassword'
+      });
+    expect(res.statusCode).toBe(400);
+    expect(res.body).toHaveProperty('message', 'Username must be at most 12 characters long.');
+  });
+
+  it('should register with username exactly 12 characters', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        username: '12characters',
+        email: 'test@example.com',
+        password: 'testpassword'
+      });
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toHaveProperty('message', 'User registered successfully.');
+  });
+
+  it('should register with password exactly 6 characters', async () => {
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({
+        username: 'testuser',
+        email: 'test@example.com',
+        password: '123456' // exactly 6 characters
+      });
+    expect(res.statusCode).toBe(201);
+    expect(res.body).toHaveProperty('message', 'User registered successfully.');
+  });
+
   it('should not register with duplicate email', async () => {
     // First registration
     await request(app)
