@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet, ViewStyle, Dimensions } from 'react-native';
+import { colors, typography } from '../theme';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    color: '#fff',
-    fontSize: 17,
+    color: colors.text.primary,
+    fontSize: typography.fontSize.md,
   },
 });

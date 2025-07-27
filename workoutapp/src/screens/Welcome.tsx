@@ -9,6 +9,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { getAuthToken } from '../api/auth';
+import { colors, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
@@ -36,7 +37,7 @@ export default function Welcome({ navigation }: Props) {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={colors.button.primary} />
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
@@ -68,7 +69,7 @@ export default function Welcome({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#333333',
+    backgroundColor: colors.background.primary,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -78,9 +79,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#ffffff',
+    fontSize: typography.fontSize.title,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.text.primary,
     marginBottom: 32,
     textAlign: 'center',
   },
@@ -89,16 +90,16 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   primaryButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.button.primary,
     paddingHorizontal: 40,
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   primaryButtonText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '600',
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
   },
   secondaryButton: {
     backgroundColor: 'transparent',
@@ -107,16 +108,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#007AFF',
+    borderColor: colors.button.primary,
   },
   secondaryButtonText: {
-    color: '#007AFF',
-    fontSize: 18,
-    fontWeight: '600',
+    color: colors.button.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
   },
   loadingText: {
-    color: '#ffffff',
-    fontSize: 16,
+    color: colors.text.primary,
+    fontSize: typography.fontSize.md,
     marginTop: 16,
   },
 }); 

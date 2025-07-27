@@ -1,4 +1,5 @@
 import { Pressable, Text, StyleSheet, ViewStyle } from 'react-native'
+import { colors, typography } from '../theme';
 
 type TileBlockProps = {
   title: string
@@ -19,7 +20,7 @@ export default function TileBlock({ title, onPress, style }: TileBlockProps) {
 
 const styles = StyleSheet.create({
   tile: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: colors.button.primary,
     padding: 20,
     borderRadius: 8,
     justifyContent: 'center',
@@ -32,8 +33,8 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   title: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
   },
 })

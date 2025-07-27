@@ -3,6 +3,7 @@ import TileBlock from '../components/TileBlock'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { removeAuthToken } from '../api/auth';
+import { colors, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
@@ -40,14 +41,14 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 40,
     paddingHorizontal: 10,
-    backgroundColor: '#333333',
+    backgroundColor: colors.background.primary,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   tileBlock: {
-    backgroundColor: '#222',
+    backgroundColor: colors.background.secondary,
   },
 
   header: {
@@ -61,14 +62,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoutButton: {
-    backgroundColor: '#444444',
+    backgroundColor: colors.border.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 4,
   },
   logoutText: {
-    color: '#cccccc',
-    fontSize: 12,
-    fontWeight: '500',
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.xs,
+    fontWeight: typography.fontWeight.medium,
   },
 })

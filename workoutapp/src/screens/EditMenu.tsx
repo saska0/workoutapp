@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, ScrollView } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 import MenuRow from '../components/MenuRow';
 import { fetchTemplates } from '../api/templates';
 import TileBlock from '@components/TileBlock';
 import SwipeRow from '@nghinv/react-native-swipe-row';
+import { colors, typography } from '../theme';
 
-export default function EditMenu() {
+type Props = NativeStackScreenProps<RootStackParamList, 'EditMenu'>;
+
+export default function EditMenu({ navigation }: Props) {
   const [workouts, setWorkouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,14 +24,22 @@ export default function EditMenu() {
   
   return (
     <View style={styles.container}>
-        <View style={styles.row}>
-          <TileBlock title="Create" onPress={() => console.log('Create')} style={styles.tileBlock} />
-          <TileBlock title="Browse" onPress={() => console.log('Browse')} style={styles.tileBlock} />
-        </View>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Text style={styles.backButtonText}>✕</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Edit Workouts</Text>
+        <View style={styles.headerSpacer} />
+      </View>
+      
+      <View style={styles.row}>
+        <TileBlock title="Create" onPress={() => console.log('Create')} style={styles.tileBlock} />
+        <TileBlock title="Browse" onPress={() => console.log('Browse')} style={styles.tileBlock} />
+      </View>
       {loading ? (
-        <ActivityIndicator size="large" color="#fff" />
+        <ActivityIndicator size="large" color={colors.text.primary} />
       ) : error ? (
-        <Text style={{ color: 'red', marginBottom: 10 }}>{error}</Text>
+        <Text style={{ color: colors.text.error, marginBottom: 10 }}>{error}</Text>
       ) : (
         <ScrollView style={styles.scrollView}>
           {workouts.map((workout) => (
@@ -61,8 +74,31 @@ export default function EditMenu() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#333',
+    backgroundColor: colors.background.primary,
     paddingTop: 70,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  backButton: {
+    padding: 8,
+  },
+  backButtonText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+  },
+  headerTitle: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
+  },
+  headerSpacer: {
+    width: 40,
   },
   row: {
     flexDirection: 'row',
@@ -70,11 +106,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   tileBlock: {
-    backgroundColor: '#222',
+    backgroundColor: colors.background.secondary,
   },
   scrollView: {
     flex: 1,
     marginTop: 10,
-    backgroundColor: '#222',
+    backgroundColor: colors.background.secondary,
   },
 });

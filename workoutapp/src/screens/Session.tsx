@@ -4,6 +4,7 @@ import { RootStackParamList } from '../types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import TileBlock from '../components/TileBlock';
 import { useSessionTimer } from '../context/SessionTimerContext';
+import { colors, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Session'>;
 
@@ -59,13 +60,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#333333',
+    backgroundColor: colors.background.primary,
   },
   timer: {
-    fontSize: 24,
+    fontSize: typography.fontSize.timer,
     marginBottom: 20,
     marginTop: 40,
-    color: '#fff',
+    color: colors.text.primary,
     textAlign: 'center',
   },
   scrollView: {
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   tileBlock: {
-    backgroundColor: '#222',
+    backgroundColor: colors.background.secondary,
   },
   endSessionTile: {
     backgroundColor: '#e74a3b',

@@ -14,6 +14,7 @@ import {
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { register, login, storeAuthToken } from '../api/auth';
+import { colors, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
@@ -114,7 +115,7 @@ export default function Register({ navigation }: Props) {
             <TextInput
               style={[styles.input, errors.username && styles.inputError]}
               placeholder="Enter your username"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.text.placeholder}
               value={formData.username}
               onChangeText={(value) => updateFormData('username', value)}
             />
@@ -126,7 +127,7 @@ export default function Register({ navigation }: Props) {
             <TextInput
               style={[styles.input, errors.email && styles.inputError]}
               placeholder="Enter your email"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.text.placeholder}
               value={formData.email}
               onChangeText={(value) => updateFormData('email', value)}
               keyboardType="email-address"
@@ -139,7 +140,7 @@ export default function Register({ navigation }: Props) {
             <TextInput
               style={[styles.input, errors.password && styles.inputError]}
               placeholder="Enter your password"
-              placeholderTextColor="#666"
+              placeholderTextColor={colors.text.placeholder}
               value={formData.password}
               onChangeText={(value) => updateFormData('password', value)}
               secureTextEntry
@@ -155,7 +156,7 @@ export default function Register({ navigation }: Props) {
             disabled={isLoading}
           >
             {isLoading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.text.primary} />
             ) : (
               <Text style={styles.buttonText}>Create Account</Text>
             )}
@@ -176,7 +177,7 @@ export default function Register({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#333333',
+    backgroundColor: colors.background.primary,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -189,9 +190,9 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#ffffff',
+    fontSize: typography.fontSize.title,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.text.primary,
     marginBottom: 8,
   },
   form: {
@@ -201,31 +202,31 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#ffffff',
+    fontSize: typography.fontSize.md,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.text.primary,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: '#222222',
+    backgroundColor: colors.input.background,
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    fontSize: 16,
-    color: '#ffffff',
+    fontSize: typography.fontSize.md,
+    color: colors.text.primary,
     borderWidth: 1,
-    borderColor: '#444444',
+    borderColor: colors.input.border,
   },
   inputError: {
-    borderColor: '#ff6b6b',
+    borderColor: colors.input.borderError,
   },
   errorText: {
-    color: '#ff6b6b',
-    fontSize: 14,
+    color: colors.text.error,
+    fontSize: typography.fontSize.sm,
     marginTop: 4,
   },
   button: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.button.primary,
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
@@ -233,12 +234,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonDisabled: {
-    backgroundColor: '#666666',
+    backgroundColor: colors.button.disabled,
   },
   buttonText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '600',
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
   },
   loginContainer: {
     flexDirection: 'row',
@@ -246,12 +247,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginText: {
-    color: '#cccccc',
-    fontSize: 16,
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.md,
   },
   loginLink: {
-    color: '#007AFF',
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.button.primary,
+    fontSize: typography.fontSize.md,
+    fontWeight: typography.fontWeight.semibold,
   },
 });
