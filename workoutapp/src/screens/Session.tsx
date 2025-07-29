@@ -35,7 +35,57 @@ export default function SessionScreen({ navigation }: Props) {
       
       <ScrollView style={styles.scrollView}>
         <View style={styles.row}>
-          <TileBlock title="Stretch 1" onPress={() => console.log('Stretch 1')} style={styles.tileBlock} />
+          <TileBlock 
+            title="Stretch 1" 
+            onPress={() => navigation.navigate('WorkoutTimer', {
+              workoutTemplate: {
+                name: 'Morning Stretch Routine',
+                steps: [
+                  {
+                    name: '1',
+                    kind: 'stretch',
+                    durationSec: 30,
+                    reps: 3,
+                    restDurationSec: 15,
+                    notes: '111'
+                  },
+                  {
+                    name: '2',
+                    kind: 'stretch',
+                    durationSec: 45,
+                    reps: 2,
+                    restDurationSec: 20,
+                    notes: '222'
+                  },
+                  {
+                    name: '3',
+                    kind: 'stretch',
+                    durationSec: 30,
+                    reps: 3,
+                    restDurationSec: 10,
+                    notes: '333'
+                  },
+                  {
+                    name: '4',
+                    kind: 'stretch',
+                    durationSec: 40,
+                    reps: 2,
+                    restDurationSec: 25,
+                    notes: '444'
+                  },
+                  {
+                    name: '5',
+                    kind: 'stretch',
+                    durationSec: 35,
+                    reps: 3,
+                    restDurationSec: 12,
+                    notes: '555'
+                  }
+                ]
+              }
+            })} 
+            style={styles.tileBlock} 
+          />
           <TileBlock title="Stretch 2" onPress={() => console.log('Stretch 2')} style={styles.tileBlock} />
         </View>
         <View style={styles.row}>

@@ -9,6 +9,7 @@ export const WorkoutStepSchema = new mongoose.Schema({
   },
   durationSec: Number,
   reps: Number,
+  restDurationSec: { type: Number, default: 30 },
   workoutId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workout', default: null },
   notes: String
 }, { _id: false });

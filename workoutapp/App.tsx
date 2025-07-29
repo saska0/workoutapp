@@ -7,6 +7,7 @@ import SessionScreen from './src/screens/Session';
 import Register from './src/screens/Register';
 import Login from './src/screens/Login';
 import Welcome from './src/screens/Welcome';
+import WorkoutTimer from './src/screens/WorkoutTimer';
 import { RootStackParamList } from './src/types/navigation';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import EditMenu from '@screens/EditMenu';
@@ -68,6 +69,15 @@ export default function App() {
             <Stack.Screen 
               name="EditMenu" 
               component={EditMenu} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_bottom',
+              }} 
+            />
+            <Stack.Screen 
+              name="WorkoutTimer" 
+              component={WorkoutTimer} 
               options={{ 
                 headerShown: false,
                 gestureEnabled: true,
