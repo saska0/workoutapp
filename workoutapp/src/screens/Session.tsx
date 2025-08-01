@@ -39,7 +39,7 @@ export default function SessionScreen({ navigation }: Props) {
             title="Stretch 1" 
             onPress={() => navigation.navigate('WorkoutTimer', {
               workoutTemplate: {
-                name: 'Morning Stretch Routine',
+                name: 'Stretch 1',
                 steps: [
                   {
                     name: '1',

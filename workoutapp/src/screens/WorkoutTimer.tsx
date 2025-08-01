@@ -376,7 +376,9 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
           <Text style={styles.timerLabel}>
             {state.isInPrepare ? 'Get Ready' : state.isInRest ? 'Rest Time' : 'Time Remaining'}
           </Text>
-          <Text style={styles.timerText}>{formatTime(state.timeRemaining)}</Text>
+          <Text testID="timer-text" style={styles.timerText}>
+            {formatTime(state.timeRemaining)}
+          </Text>
         </View>
 
         <View style={styles.exerciseContainer}>
@@ -401,11 +403,11 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>Rep</Text>
-            <Text style={styles.statValue}>{state.currentRep}/{currentStep?.reps || 1}</Text>
+            <Text testID="rep" style={styles.statValue}>{state.currentRep}/{currentStep?.reps || 1}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statLabel}>Step</Text>
-            <Text style={styles.statValue}>{state.currentStepIndex + 1}/{workoutTemplate.steps.length}</Text>
+            <Text testID="step" style={styles.statValue}>{state.currentStepIndex + 1}/{workoutTemplate.steps.length}</Text>
           </View>
         </View>
 
@@ -418,6 +420,7 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
         <TouchableOpacity
            style={[styles.controlButton, styles.backButton]}
            onPress={goBack}
+           testID="previous-button"
          >
           <Text style={styles.controlButtonText}>prev</Text>
         </TouchableOpacity>
@@ -426,6 +429,7 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
           <TouchableOpacity
             style={[styles.controlButton]}
             onPress={startTimer}
+            testID="start-button"
           >
             <Text style={styles.controlButtonText}>play</Text>
           </TouchableOpacity>
@@ -433,6 +437,7 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
           <TouchableOpacity
             style={[styles.controlButton]}
             onPress={resumeTimer}
+            testID="resume-button"
           >
             <Text style={styles.controlButtonText}>play</Text>
           </TouchableOpacity>
@@ -440,6 +445,7 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
           <TouchableOpacity
             style={[styles.controlButton]}
             onPress={pauseTimer}
+            testID="pause-button"
           >
             <Text style={styles.controlButtonText}>pause</Text>
           </TouchableOpacity>
@@ -449,6 +455,7 @@ const WorkoutTimer: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
           style={[styles.controlButton]}
           onPress={skipStep}
           disabled={isWorkoutComplete}
+          testID="skip-button"
         >
           <Text style={styles.controlButtonText}>next</Text>
         </TouchableOpacity>
