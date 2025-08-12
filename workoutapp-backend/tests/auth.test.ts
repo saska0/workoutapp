@@ -1,18 +1,23 @@
 import request from 'supertest';
-import app from '../src/app';
 import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import app from '../src/app';
 import User from '../src/models/User';
 
+let mongoServer: MongoMemoryServer;
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
 beforeEach(async () => {
-  try {
-    await User.deleteMany({});
-  } catch (error) {
-    console.error('Error in beforeEach:', error);
-  }
+  await User.deleteMany({});
 });
 
 afterAll(async () => {
-  await mongoose.connection.close();
+  await mongoose.disconnect();
+  await mongoServer.stop();
 });
 
 describe('Auth Endpoints', () => {

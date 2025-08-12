@@ -37,7 +37,7 @@ export default function EditMenu({ navigation }: Props) {
         <TileBlock title="Browse" onPress={() => console.log('Browse')} style={styles.tileBlock} />
       </View>
       {loading ? (
-        <ActivityIndicator size="large" color={colors.text.primary} />
+        <ActivityIndicator testID="loading-indicator" size="large" color={colors.text.primary} />
       ) : error ? (
         <Text style={{ color: colors.text.error, marginBottom: 10 }}>{error}</Text>
       ) : (

@@ -191,6 +191,32 @@ describe('WorkoutTimer', () => {
     });
   });
 
+// it('completes workout and shows completion message', async () => {
+//   const { getByText } = render(
+//     <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+//   );
+//
+//   // Start the timer
+//   fireEvent.press(getByText('Start'));
+//   
+//   // Skip through all steps
+//   await waitFor(() => {
+//     expect(getByText('exercise1')).toBeTruthy();
+//   });
+//   
+//   fireEvent.press(getByText('Skip'));
+//   await waitFor(() => {
+//     expect(getByText('Rest')).toBeTruthy();
+//   });
+//   
+//   fireEvent.press(getByText('Skip'));
+//   
+//   // Should show completion
+//   await waitFor(() => {
+//     expect(getByText('Workout Complete!')).toBeTruthy();
+//   });
+// });
+
   it('decrements timeRemaining on each tick', async() => {
     const { getByTestId } = render(
       <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
