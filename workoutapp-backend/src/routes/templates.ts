@@ -5,7 +5,6 @@ import User from '../models/User';
 
 const router = express.Router();
 
-// Get user's selected templates
 router.get('/selected', authenticateJWT, async (req: AuthRequest, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
@@ -18,7 +17,6 @@ router.get('/selected', authenticateJWT, async (req: AuthRequest, res) => {
   }
 });
 
-// Update user's selected templates
 router.patch('/selected', authenticateJWT, async (req: AuthRequest, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
