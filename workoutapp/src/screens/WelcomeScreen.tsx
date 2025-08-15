@@ -13,7 +13,7 @@ import { colors, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
-export default function Welcome({ navigation }: Props) {
+export default function WelcomeScreen({ navigation }: Props) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -120,4 +120,4 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.md,
     marginTop: 16,
   },
-}); 
+});

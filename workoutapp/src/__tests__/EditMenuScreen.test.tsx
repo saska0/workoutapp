@@ -2,7 +2,7 @@ import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
 import { fetchTemplates } from '../api/templates';
-import EditMenu from '../screens/EditMenu';
+import EditMenuScreen from '../screens/EditMenuScreen';
 import { render, waitFor, fireEvent } from '@testing-library/react-native';
 
 jest.mock('../api/templates');
@@ -32,7 +32,7 @@ describe('EditMenu screen', () => {
   it('shows loading indicator while fetching templates', () => {
     mockedFetchTemplates.mockReturnValue(new Promise(() => {})); // never resolves
 
-    const { getByTestId } = render(<EditMenu {...props} />);
+    const { getByTestId } = render(<EditMenuScreen {...props} />);
     expect(getByTestId('loading-indicator')).toBeTruthy();
   });
 
@@ -42,7 +42,7 @@ describe('EditMenu screen', () => {
       { _id: '2', name: 'Workout B' },
     ]);
 
-    const { getByText } = render(<EditMenu {...props} />);
+    const { getByText } = render(<EditMenuScreen {...props} />);
 
     await waitFor(() => {
       expect(getByText('Workout A')).toBeTruthy();
@@ -53,7 +53,7 @@ describe('EditMenu screen', () => {
   it('shows error message when fetchTemplates fails', async () => {
     mockedFetchTemplates.mockRejectedValue(new Error('Failed to fetch'));
 
-    const { getByText } = render(<EditMenu {...props} />);
+    const { getByText } = render(<EditMenuScreen {...props} />);
 
     await waitFor(() => {
       expect(getByText('Failed to fetch')).toBeTruthy();
@@ -63,7 +63,7 @@ describe('EditMenu screen', () => {
   it('calls navigation.goBack when close button is pressed', async () => {
     mockedFetchTemplates.mockResolvedValue([]); // return empty list to avoid loading
 
-    const { getByText } = render(<EditMenu {...props} />);
+    const { getByText } = render(<EditMenuScreen {...props} />);
 
     await waitFor(() => {
       fireEvent.press(getByText('✕'));
@@ -74,7 +74,7 @@ describe('EditMenu screen', () => {
   it('renders Create and Browse buttons', async () => {
     mockedFetchTemplates.mockResolvedValue([]);
 
-    const { getByText } = render(<EditMenu {...props} />);
+    const { getByText } = render(<EditMenuScreen {...props} />);
 
     await waitFor(() => {
       expect(getByText('Create')).toBeTruthy();

@@ -10,7 +10,7 @@ import { colors, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditMenu'>;
 
-export default function EditMenu({ navigation }: Props) {
+export default function EditMenuScreen({ navigation }: Props) {
   const [workouts, setWorkouts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

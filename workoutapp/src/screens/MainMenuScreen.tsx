@@ -7,7 +7,7 @@ import { colors, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
-export default function MainMenu({ navigation }: Props) {
+export default function MainMenuScreen({ navigation }: Props) {
   const handleLogout = async () => {
     await removeAuthToken();
     navigation.replace('Welcome');

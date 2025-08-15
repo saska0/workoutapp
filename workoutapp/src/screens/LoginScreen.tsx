@@ -23,7 +23,7 @@ type FormData = {
   password: string;
 };
 
-export default function Login({ navigation }: Props) {
+export default function LoginScreen({ navigation }: Props) {
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',

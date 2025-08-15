@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import WorkoutTimer from '../screens/WorkoutTimer';
+import WorkoutTimerScreen from '../screens/WorkoutTimerScreen';
 
 const mockNavigation = {
   navigate: jest.fn(),
@@ -37,7 +37,7 @@ jest.spyOn(require('react-native'), 'Alert').mockImplementation(() => ({
   alert: jest.fn(),
 }));
 
-describe('WorkoutTimer', () => {
+describe('WorkoutTimerScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
@@ -49,7 +49,7 @@ describe('WorkoutTimer', () => {
 
   it('renders correctly with workout template', () => {
     const { getByText } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
 
     expect(getByText(/Test Workout/)).toBeTruthy();
@@ -58,7 +58,7 @@ describe('WorkoutTimer', () => {
 
   it('starts in preparation mode', () => {
     const { getByText } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
 
     expect(getByText(/Get Ready/)).toBeTruthy();
@@ -67,7 +67,7 @@ describe('WorkoutTimer', () => {
 
   it('starts countdown timer when start is pressed', async () => {
     const { getByTestId } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
   
     fireEvent.press(getByTestId('start-button'));
@@ -82,7 +82,7 @@ describe('WorkoutTimer', () => {
 
   it('pauses and resumes timer correctly', async () => {
     const { getByText, getByTestId } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
 
     fireEvent.press(getByTestId('start-button'));
@@ -102,7 +102,7 @@ describe('WorkoutTimer', () => {
 
   it('skips to next phase when skip button is pressed', async () => {
     const { getByTestId } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
 
     expect(getByTestId('rep')).toHaveTextContent('1/2');
@@ -126,7 +126,7 @@ describe('WorkoutTimer', () => {
 
   it('pressing previous during prep of 1st rep of 1st step goes back to beginning of prep (5s)', async () => {
     const { getByText, getByTestId } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
 
     // Start timer and go back to preparation
@@ -141,7 +141,7 @@ describe('WorkoutTimer', () => {
 
   it('pressing previous during an exercise goes back to prep', async () => {
     const { getByText, getByTestId } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
 
     // Skip prep and go back
@@ -155,7 +155,7 @@ describe('WorkoutTimer', () => {
 
   it('pressing previous goes back to previous rep', async () => {
     const { getByTestId } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
 
     // Skip to the next rep and go back
@@ -173,7 +173,7 @@ describe('WorkoutTimer', () => {
 
   it('pressing previous goes back to previous step', async () => {
     const { getByTestId } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
 
     // Skip to the next step and go back
@@ -191,35 +191,9 @@ describe('WorkoutTimer', () => {
     });
   });
 
-// it('completes workout and shows completion message', async () => {
-//   const { getByText } = render(
-//     <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
-//   );
-//
-//   // Start the timer
-//   fireEvent.press(getByText('Start'));
-//   
-//   // Skip through all steps
-//   await waitFor(() => {
-//     expect(getByText('exercise1')).toBeTruthy();
-//   });
-//   
-//   fireEvent.press(getByText('Skip'));
-//   await waitFor(() => {
-//     expect(getByText('Rest')).toBeTruthy();
-//   });
-//   
-//   fireEvent.press(getByText('Skip'));
-//   
-//   // Should show completion
-//   await waitFor(() => {
-//     expect(getByText('Workout Complete!')).toBeTruthy();
-//   });
-// });
-
   it('decrements timeRemaining on each tick', async() => {
     const { getByTestId } = render(
-      <WorkoutTimer route={mockRoute} navigation={mockNavigation} />
+      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
     );
   
     fireEvent.press(getByTestId('start-button'));

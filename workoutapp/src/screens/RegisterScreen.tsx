@@ -24,7 +24,7 @@ type FormData = {
   password: string;
 };
 
-export default function Register({ navigation }: Props) {
+export default function RegisterScreen({ navigation }: Props) {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     email: '',
@@ -147,8 +147,6 @@ export default function Register({ navigation }: Props) {
             />
             {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
           </View>
-
-          
 
           <TouchableOpacity
             style={[styles.button, isLoading && styles.buttonDisabled]}

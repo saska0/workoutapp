@@ -283,7 +283,7 @@ const workoutTimerReducer = (
   }
 };
 
-const WorkoutTimer: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
+const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
   const { workoutTemplate } = route.params;
   
   const [state, dispatch] = useReducer(
@@ -565,7 +565,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 5,
-    
   },
   statItem: {
     alignItems: 'center',
@@ -628,4 +627,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WorkoutTimer;
+export default WorkoutTimerScreen;

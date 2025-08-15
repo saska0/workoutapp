@@ -2,15 +2,15 @@ import { SessionTimerProvider } from './src/context/SessionTimerContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet, View } from 'react-native';
-import MainMenu from './src/screens/MainMenu';
-import SessionScreen from './src/screens/Session';
-import Register from './src/screens/Register';
-import Login from './src/screens/Login';
-import Welcome from './src/screens/Welcome';
-import WorkoutTimer from './src/screens/WorkoutTimer';
+import MainMenuScreen from './src/screens/MainMenuScreen';
+import SessionScreen from './src/screens/SessionScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import WelcomeScreen from './src/screens/WelcomeScreen';
+import WorkoutTimerScreen from './src/screens/WorkoutTimerScreen';
 import { RootStackParamList } from './src/types/navigation';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import EditMenu from '@screens/EditMenu';
+import EditMenuScreen from '@screens/EditMenuScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -23,7 +23,7 @@ export default function App() {
           <Stack.Navigator initialRouteName="Welcome">
             <Stack.Screen 
               name="Welcome" 
-              component={Welcome} 
+              component={WelcomeScreen} 
               options={{ 
                 headerShown: false, 
                 gestureEnabled: false,
@@ -32,7 +32,7 @@ export default function App() {
              />
             <Stack.Screen 
               name="Main" 
-              component={MainMenu} 
+              component={MainMenuScreen} 
               options={{ 
                 headerShown: false, 
                 gestureEnabled: false,
@@ -41,7 +41,7 @@ export default function App() {
              />
             <Stack.Screen 
               name="Login" 
-              component={Login} 
+              component={LoginScreen} 
               options={{ 
                 headerShown: false,
                 gestureEnabled: true,
@@ -50,7 +50,7 @@ export default function App() {
             />
             <Stack.Screen 
               name="Register" 
-              component={Register} 
+              component={RegisterScreen} 
               options={{ 
                 headerShown: false,
                 gestureEnabled: true,
@@ -68,7 +68,7 @@ export default function App() {
             />
             <Stack.Screen 
               name="EditMenu" 
-              component={EditMenu} 
+              component={EditMenuScreen} 
               options={{ 
                 headerShown: false,
                 gestureEnabled: true,
@@ -77,7 +77,7 @@ export default function App() {
             />
             <Stack.Screen 
               name="WorkoutTimer" 
-              component={WorkoutTimer} 
+              component={WorkoutTimerScreen} 
               options={{ 
                 headerShown: false,
                 gestureEnabled: true,
