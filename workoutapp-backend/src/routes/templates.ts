@@ -34,14 +34,14 @@ router.patch('/selected', authenticateJWT, async (req: AuthRequest, res) => {
 
 router.post('/', authenticateJWT, async (req: AuthRequest, res) => {
   try {
-    const { name, steps, userId, isPublic = false } = req.body;
-    if (!req.user || req.user.userId !== userId) {
-      return res.status(403).json({ error: 'Unauthorized' });
+    const { name, steps, isPublic = false } = req.body;
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
     }
     const newTemplate = new WorkoutSequenceTemplate({
       name,
       steps,
-      userId,
+      userId: req.user.userId,
       isPublic
     });
     const saved = await newTemplate.save();

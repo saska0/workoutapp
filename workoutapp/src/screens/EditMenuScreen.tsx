@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import MenuRow from '../components/MenuRow';
-import { fetchTemplates } from '../api/templates';
+import { fetchUserTemplates } from '../api/templates';
+import { getAuthToken } from '../api/auth';
 import TileBlock from '@components/TileBlock';
 import SwipeRow from '@nghinv/react-native-swipe-row';
 import { colors, typography } from '../theme';
@@ -15,12 +17,26 @@ export default function EditMenuScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchTemplates()
-      .then(setWorkouts)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+  const fetchTemplates = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = await getAuthToken();
+      if (!token) throw new Error('No auth token');
+      const data = await fetchUserTemplates(token);
+      setWorkouts(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch templates');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchTemplates();
+    }, [fetchTemplates])
+  );
   
   return (
     <View style={styles.container}>
@@ -33,7 +49,7 @@ export default function EditMenuScreen({ navigation }: Props) {
       </View>
       
       <View style={styles.row}>
-        <TileBlock title="Create" onPress={() => console.log('Create')} style={styles.tileBlock} />
+  <TileBlock title="Create" onPress={() => navigation.navigate('CreateTemplate')} style={styles.tileBlock} />
         <TileBlock title="Browse" onPress={() => console.log('Browse')} style={styles.tileBlock} />
       </View>
       {loading ? (

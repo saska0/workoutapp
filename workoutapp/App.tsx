@@ -11,6 +11,7 @@ import WorkoutTimerScreen from './src/screens/WorkoutTimerScreen';
 import { RootStackParamList } from './src/types/navigation';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import EditMenuScreen from '@screens/EditMenuScreen';
+import CreateTemplateScreen from './src/screens/CreateTemplateScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -82,6 +83,15 @@ export default function App() {
                 headerShown: false,
                 gestureEnabled: true,
                 animation: 'slide_from_bottom',
+              }} 
+            />
+            <Stack.Screen 
+              name="CreateTemplate" 
+              component={CreateTemplateScreen} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_right',
               }} 
             />
           </Stack.Navigator>

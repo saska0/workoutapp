@@ -1,12 +1,12 @@
 import React from 'react';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types/navigation';
-import { fetchTemplates } from '../api/templates';
+import { fetchUserTemplates } from '../api/templates';
 import EditMenuScreen from '../screens/EditMenuScreen';
 import { render, waitFor, fireEvent } from '@testing-library/react-native';
 
 jest.mock('../api/templates');
-const mockedFetchTemplates = fetchTemplates as jest.Mock;
+const mockedFetchTemplates = fetchUserTemplates as jest.Mock;
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditMenu'>;
 
@@ -36,7 +36,7 @@ describe('EditMenu screen', () => {
     expect(getByTestId('loading-indicator')).toBeTruthy();
   });
 
-  it('renders workout list when fetchTemplates succeeds', async () => {
+  it('renders workout list when fetchUserTemplates succeeds', async () => {
     mockedFetchTemplates.mockResolvedValue([
       { _id: '1', name: 'Workout A' },
       { _id: '2', name: 'Workout B' },
@@ -50,7 +50,7 @@ describe('EditMenu screen', () => {
     });
   });
 
-  it('shows error message when fetchTemplates fails', async () => {
+  it('shows error message when fetchUserTemplates fails', async () => {
     mockedFetchTemplates.mockRejectedValue(new Error('Failed to fetch'));
 
     const { getByText } = render(<EditMenuScreen {...props} />);
