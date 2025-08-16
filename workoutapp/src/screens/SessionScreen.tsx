@@ -130,6 +130,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
   },
   endSessionTile: {
-    backgroundColor: '#e74a3b',
+    backgroundColor: colors.button.deactivated,
   },
 });

@@ -1,0 +1,142 @@
+import React from 'react';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  runOnJS,
+  interpolate,
+  interpolateColor,
+} from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { colors, typography } from '../theme';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const MAX_SWIPE_DISTANCE = SCREEN_WIDTH * 0.35;
+const SWIPE_THRESHOLD = MAX_SWIPE_DISTANCE * 0.95;
+
+interface SwipeableRowProps {
+  onActivate: () => void;
+  children: React.ReactNode;
+  isSelected?: boolean;
+}
+
+export default function SwipeableRow({ onActivate, children, isSelected = false }: SwipeableRowProps) {
+  const translateX = useSharedValue(0);
+
+  const panGesture = Gesture.Pan()
+    .onStart(() => {
+      // Reset position at start of gesture
+    })
+    .onUpdate((event) => {
+      // Only allow left swipe (negative values) and limit to max distance
+      if (event.translationX <= 0) {
+        translateX.value = Math.max(event.translationX, -MAX_SWIPE_DISTANCE);
+      }
+    })
+    .onEnd(() => {
+      if (Math.abs(translateX.value) > SWIPE_THRESHOLD) {
+        // Activate action - swipe far enough to the left
+        translateX.value = withSpring(0, {
+          damping: 20,
+          stiffness: 300,
+          mass: 0.8,
+          overshootClamping: true,
+        });
+        runOnJS(onActivate)();
+      } else {
+        translateX.value = withSpring(0, {
+          damping: 20,
+          stiffness: 300,
+          mass: 0.8,
+          overshootClamping: true,
+        });
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
+  const indicatorStyle = useAnimatedStyle(() => {
+    const progress = Math.abs(translateX.value) / MAX_SWIPE_DISTANCE;
+    
+    const colorRange = isSelected 
+      ? [colors.button.activated, colors.button.disabled, colors.button.deactivated] 
+      : [colors.background.primary, colors.button.disabled, colors.button.activated];
+    
+    const backgroundColor = interpolateColor(
+      progress,
+      [0, 0.5, 1],
+      colorRange
+    );
+    
+    const opacity = interpolate(progress, [0, 1], [0.3, 1]);
+    
+    return {
+      backgroundColor,
+      opacity,
+    };
+  });
+
+  const textStyle = useAnimatedStyle(() => {
+    const progress = Math.abs(translateX.value) / MAX_SWIPE_DISTANCE;
+    const opacity = interpolate(progress, [0, 0.3, 1], [0, 0.5, 1]);
+    
+    return {
+      opacity,
+    };
+  });
+
+  return (
+    <View style={styles.swipeContainer}>
+      <Animated.View style={[styles.indicator, indicatorStyle]}>
+        <Animated.Text style={[styles.indicatorText, textStyle]}>
+          {isSelected ? 'DESELECT' : 'SELECT'}
+        </Animated.Text>
+      </Animated.View>
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[
+          styles.rowContainer, 
+          isSelected ? styles.selectedRowContainer : styles.unselectedRowContainer,
+          animatedStyle
+        ]}>
+          {children}
+        </Animated.View>
+      </GestureDetector>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  swipeContainer: {
+    position: 'relative',
+    marginVertical: 1,
+  },
+  indicator: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: MAX_SWIPE_DISTANCE,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 0,
+  },
+  indicatorText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.bold,
+    letterSpacing: 1,
+  },
+  rowContainer: {
+    backgroundColor: colors.background.secondary,
+    zIndex: 1,
+  },
+  selectedRowContainer: {
+    backgroundColor: colors.background.lighter,
+  },
+  unselectedRowContainer: {
+    backgroundColor: colors.background.secondary,
+  },
+});

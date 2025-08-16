@@ -2,6 +2,7 @@ export const colors = {
   background: {
     primary: '#333333',
     secondary: '#222222',
+    lighter: '#444444'
   },
   
   text: {
@@ -19,6 +20,8 @@ export const colors = {
   button: {
     primary: '#007AFF',
     disabled: '#666666',
+    activated: '#237e48ff',
+    deactivated: '#862c2cff',
   },
   
   input: {
