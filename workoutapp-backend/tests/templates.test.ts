@@ -132,6 +132,7 @@ describe('Template Routes', () => {
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(1);
       expect(response.body[0].name).toBe('Shared Template');
+      expect(response.body[0].ownerUsername).toBe('testuser2');
     });
   });
 
@@ -235,8 +236,7 @@ describe('Template Routes', () => {
 
       const response = await request(app)
         .post(`/api/templates/${template._id}/copy`)
-        .set('Authorization', `Bearer ${user2Token}`)
-        .send({ userId: user2._id });
+        .set('Authorization', `Bearer ${user2Token}`);
 
       expect(response.status).toBe(201);
       expect(response.body.name).toBe('Original Template');

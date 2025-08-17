@@ -105,6 +105,7 @@ export default function LoginScreen({ navigation }: Props) {
               value={formData.email}
               onChangeText={(value) => updateFormData('email', value)}
               keyboardType="email-address"
+              keyboardAppearance="dark"
             />
             {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
           </View>
@@ -118,6 +119,7 @@ export default function LoginScreen({ navigation }: Props) {
               value={formData.password}
               onChangeText={(value) => updateFormData('password', value)}
               secureTextEntry
+              keyboardAppearance="dark"
             />
             {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
           </View>

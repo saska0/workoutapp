@@ -12,12 +12,14 @@ import { RootStackParamList } from './src/types/navigation';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import EditMenuScreen from '@screens/EditMenuScreen';
 import CreateTemplateScreen from './src/screens/CreateTemplateScreen';
+import EditTemplateScreen from './src/screens/EditTemplateScreen';
+import BrowseTemplatesScreen from './src/screens/BrowseTemplatesScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <SessionTimerProvider>
       <View style={styles.container}>
         <NavigationContainer>
@@ -88,6 +90,24 @@ export default function App() {
             <Stack.Screen 
               name="CreateTemplate" 
               component={CreateTemplateScreen} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_right',
+              }} 
+            />
+            <Stack.Screen 
+              name="BrowseTemplates" 
+              component={BrowseTemplatesScreen} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_right',
+              }} 
+            />
+            <Stack.Screen 
+              name="EditTemplate" 
+              component={EditTemplateScreen} 
               options={{ 
                 headerShown: false,
                 gestureEnabled: true,

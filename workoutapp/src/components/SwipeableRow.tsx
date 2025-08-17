@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, Platform } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,6 +14,8 @@ import { colors, typography } from '../theme';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const MAX_SWIPE_DISTANCE = SCREEN_WIDTH * 0.35;
 const SWIPE_THRESHOLD = MAX_SWIPE_DISTANCE * 0.95;
+// Do not capture gestures starting at the very left edge on iOS
+const IOS_BACK_GESTURE_EXCLUDE = 30; // px
 
 interface SwipeableRowProps {
   onActivate: () => void;
@@ -23,8 +25,8 @@ interface SwipeableRowProps {
 
 export default function SwipeableRow({ onActivate, children, isSelected = false }: SwipeableRowProps) {
   const translateX = useSharedValue(0);
-
   const panGesture = Gesture.Pan()
+    .hitSlop(Platform.OS === 'ios' ? { left: -IOS_BACK_GESTURE_EXCLUDE } : undefined)
     .onStart(() => {
       // Reset position at start of gesture
     })
@@ -111,7 +113,6 @@ export default function SwipeableRow({ onActivate, children, isSelected = false 
 const styles = StyleSheet.create({
   swipeContainer: {
     position: 'relative',
-    marginVertical: 1,
   },
   indicator: {
     position: 'absolute',
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   selectedRowContainer: {
-    backgroundColor: colors.background.lighter,
+    backgroundColor: colors.background.primary,
   },
   unselectedRowContainer: {
     backgroundColor: colors.background.secondary,

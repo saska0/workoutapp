@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import MenuRow from '../components/MenuRow';
 import SwipeableRow from '../components/SwipeableRow';
-import { fetchUserTemplates, fetchSelectedTemplates, updateSelectedTemplates } from '../api/templates';
+import { fetchUserTemplates, fetchSelectedTemplates, updateSelectedTemplates, deleteTemplate } from '../api/templates';
 import { getAuthToken } from '../api/auth';
 import TileBlock from '@components/TileBlock';
 import { colors, typography } from '../theme';
@@ -17,9 +17,13 @@ export default function EditMenuScreen({ navigation }: Props) {
   const [selectedWorkouts, setSelectedWorkouts] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [menuModalVisible, setMenuModalVisible] = useState(false);
+  const [selectedWorkoutForMenu, setSelectedWorkoutForMenu] = useState<any>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
 
   const fetchTemplates = useCallback(async () => {
-    setLoading(true);
+    // Show spinner only if we don't have any items yet
+    setLoading(workouts.length === 0);
     setError(null);
     try {
       const token = await getAuthToken();
@@ -49,7 +53,7 @@ export default function EditMenuScreen({ navigation }: Props) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [workouts.length]);
 
   useFocusEffect(
     useCallback(() => {
@@ -75,11 +79,58 @@ export default function EditMenuScreen({ navigation }: Props) {
       
       await updateSelectedTemplates(token, Array.from(newSelected));
     } catch (err) {
-      // Revert on error
       setSelectedWorkouts(selectedWorkouts);
       console.error('Failed to update selection:', err);
       setError('Failed to save selection changes');
     }
+  };
+
+  const handleMenuPress = (workout: any) => {
+    setSelectedWorkoutForMenu(workout);
+    setDeleteConfirmation(false);
+    setMenuModalVisible(true);
+  };
+
+  const handleEditWorkout = () => {
+    setMenuModalVisible(false);
+    if (selectedWorkoutForMenu) {
+      console.log(selectedWorkoutForMenu._id);
+      navigation.navigate('EditTemplate', { templateId: selectedWorkoutForMenu._id });
+    }
+  };
+
+  const handleDeleteWorkout = async () => {
+    if (!deleteConfirmation) {
+      // First press: Show confirmation state
+      setDeleteConfirmation(true);
+      return;
+    }
+    
+    // Second press: Actually delete
+    setMenuModalVisible(false);
+    if (selectedWorkoutForMenu) {
+      try {
+        const token = await getAuthToken();
+        if (!token) throw new Error('No auth token');
+        await deleteTemplate(token, selectedWorkoutForMenu._id);
+        // Remove from local state
+        setWorkouts(workouts.filter(w => w._id !== selectedWorkoutForMenu._id));
+        setSelectedWorkouts(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(selectedWorkoutForMenu._id);
+          return newSet;
+        });
+      } catch (err) {
+        console.error('Failed to delete workout:', err);
+        setError('Failed to delete workout');
+      }
+    }
+  };
+
+  const closeModal = () => {
+    setMenuModalVisible(false);
+    setSelectedWorkoutForMenu(null);
+    setDeleteConfirmation(false);
   };
   
   return (
@@ -93,8 +144,8 @@ export default function EditMenuScreen({ navigation }: Props) {
       </View>
       
       <View style={styles.tileRow}>
-  <TileBlock title="Create" onPress={() => navigation.navigate('CreateTemplate')} style={styles.tileBlock} />
-        <TileBlock title="Browse" onPress={() => console.log('Browse')} style={styles.tileBlock} />
+        <TileBlock title="Create" onPress={() => navigation.navigate('CreateTemplate')} style={styles.tileBlock} />
+  <TileBlock title="Browse" onPress={() => navigation.navigate('BrowseTemplates')} style={styles.tileBlock} />
       </View>
       {loading ? (
         <ActivityIndicator testID="loading-indicator" size="large" color={colors.text.primary} />
@@ -110,13 +161,53 @@ export default function EditMenuScreen({ navigation }: Props) {
             >
               <MenuRow
                 title={workout.name}
-                onPress={() => {}}
+                onPress={() => handleMenuPress(workout)}
+                showMenuIcon
                 isSelected={selectedWorkouts.has(workout._id)}
               />
             </SwipeableRow>
           ))}
         </ScrollView>
       )}
+      
+      <Modal
+        visible={menuModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeModal}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay} 
+          activeOpacity={1} 
+          onPress={closeModal}
+        >
+          <TouchableOpacity style={styles.modalContent} activeOpacity={1} onPress={() => {}}>
+            <Text style={styles.modalTitle}>
+              {selectedWorkoutForMenu?.name}
+            </Text>
+            
+            <TouchableOpacity style={styles.modalButton} onPress={handleEditWorkout}>
+              <Text style={styles.modalButtonText}>Edit</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[
+                styles.modalButton, 
+                deleteConfirmation ? styles.confirmDeleteButton : styles.deleteButton
+              ]} 
+              onPress={handleDeleteWorkout}
+            >
+              <Text style={[styles.modalButtonText, styles.deleteButtonText]}>
+                {deleteConfirmation ? 'Confirm Delete' : 'Delete'}
+              </Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -162,5 +253,61 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 10,
     backgroundColor: colors.background.secondary,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: 12,
+    padding: 24,
+    width: '80%',
+    maxWidth: 300,
+  },
+  modalTitle: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.bold,
+    textAlign: 'center',
+    marginBottom: 15,
+  },
+  modalButton: {
+    backgroundColor: colors.button.dark,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 6,
+  },
+  modalButtonText: {
+    color: colors.text.primary,
+    fontSize: typography.fontSize.md,
+    fontWeight: typography.fontWeight.semibold,
+    textAlign: 'center',
+  },
+  deleteButton: {
+    backgroundColor: colors.button.dark,
+  },
+  confirmDeleteButton: {
+    backgroundColor: colors.button.deactivated,
+  },
+  deleteButtonText: {
+    color: colors.text.primary,
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.border.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  cancelButtonText: {
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.md,
+    textAlign: 'center',
   },
 });

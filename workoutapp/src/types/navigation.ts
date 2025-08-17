@@ -21,4 +21,6 @@ export type RootStackParamList = {
     };
   };
   CreateTemplate: undefined;
+  EditTemplate: { templateId: string };
+  BrowseTemplates: undefined;
 };

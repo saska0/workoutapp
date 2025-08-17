@@ -245,8 +245,8 @@ const styles = StyleSheet.create({
     borderColor: colors.input.border,
   },
   kindButtonSelected: {
-    backgroundColor: colors.button.primary,
-    borderColor: colors.button.primary,
+    backgroundColor: colors.button.activated,
+    borderColor: colors.button.activated,
   },
   kindText: {
     color: colors.text.primary,

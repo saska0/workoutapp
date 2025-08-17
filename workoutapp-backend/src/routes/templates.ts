@@ -73,8 +73,19 @@ router.get('/user', authenticateJWT, async (req: AuthRequest, res) => {
 router.get('/shared', authenticateJWT, async (req: AuthRequest, res) => {
   try {
     if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
-    const templates = await WorkoutSequenceTemplate.find({ isPublic: true, userId: { $ne: req.user.userId } }).sort({ createdAt: -1 });
-    return res.json(templates);
+    const templates = await WorkoutSequenceTemplate.find({ isPublic: true, userId: { $ne: req.user.userId } })
+      .sort({ createdAt: -1 })
+      .lean();
+        
+    const ownerIds = Array.from(new Set(templates.map((t: any) => String(t.userId))));
+    const owners = await User.find({ _id: { $in: ownerIds } }).select('_id username').lean();
+    const ownerMap = new Map(owners.map((u: any) => [String(u._id), u.username]));
+
+    const withOwner = templates.map((t: any) => ({
+      ...t,
+      ownerUsername: ownerMap.get(String(t.userId)) || 'Unknown',
+    }));
+    return res.json(withOwner);
   } catch (error) {
     console.error('Error fetching shared templates:', error);
     return res.status(500).json({ error: 'Failed to fetch shared templates' });
@@ -102,10 +113,7 @@ router.patch('/:id/share', authenticateJWT, async (req: AuthRequest, res) => {
 
 router.post('/:id/copy', authenticateJWT, async (req: AuthRequest, res) => {
   try {
-    const { userId } = req.body;
-    if (!req.user || req.user.userId !== userId) {
-      return res.status(403).json({ error: 'Unauthorized' });
-    }
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
     const template = await WorkoutSequenceTemplate.findById(req.params.id);
     if (!template) {
       return res.status(404).json({ error: 'Template not found' });
@@ -113,7 +121,7 @@ router.post('/:id/copy', authenticateJWT, async (req: AuthRequest, res) => {
     const copy = new WorkoutSequenceTemplate({
       name: template.name,
       steps: template.steps,
-      userId,
+      userId: req.user.userId,
       isPublic: false
     });
     const saved = await copy.save();

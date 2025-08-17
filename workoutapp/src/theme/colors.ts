@@ -22,6 +22,7 @@ export const colors = {
     disabled: '#666666',
     activated: '#237e48ff',
     deactivated: '#862c2cff',
+    dark: '#111111',
   },
   
   input: {

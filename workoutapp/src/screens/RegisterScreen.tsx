@@ -118,6 +118,7 @@ export default function RegisterScreen({ navigation }: Props) {
               placeholderTextColor={colors.text.placeholder}
               value={formData.username}
               onChangeText={(value) => updateFormData('username', value)}
+              keyboardAppearance="dark"
             />
             {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
           </View>
@@ -131,6 +132,7 @@ export default function RegisterScreen({ navigation }: Props) {
               value={formData.email}
               onChangeText={(value) => updateFormData('email', value)}
               keyboardType="email-address"
+              keyboardAppearance="dark"
             />
             {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
           </View>
@@ -144,6 +146,7 @@ export default function RegisterScreen({ navigation }: Props) {
               value={formData.password}
               onChangeText={(value) => updateFormData('password', value)}
               secureTextEntry
+              keyboardAppearance="dark"
             />
             {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
           </View>
