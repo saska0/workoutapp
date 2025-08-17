@@ -170,6 +170,60 @@ describe('Template Routes', () => {
     });
   });
 
+  describe('PUT /:id', () => {
+    it('should update an owned template', async () => {
+      const template = await WorkoutSequenceTemplate.create({
+        name: 'Original',
+        steps: [{ name: 'S1', kind: 'exercise', durationSec: 10 }],
+        userId: user1._id,
+        isPublic: false,
+      });
+
+      const body = {
+        name: 'Updated Name',
+        steps: [
+          { name: '11', kind: 'prepare', durationSec: 30 },
+          { name: '22', kind: 'exercise', reps: 15, restDurationSec: 45 },
+        ],
+        isPublic: true,
+      };
+
+      const res = await request(app)
+        .put(`/api/templates/${template._id}`)
+        .set('Authorization', `Bearer ${user1Token}`)
+        .send(body);
+
+      expect(res.status).toBe(200);
+      expect(res.body.name).toBe(body.name);
+      expect(res.body.steps).toHaveLength(2);
+      expect(res.body.isPublic).toBe(true);
+    });
+
+    it('should not allow updating someone else\'s template', async () => {
+      const template = await WorkoutSequenceTemplate.create({
+        name: 'Original',
+        steps: [],
+        userId: user1._id,
+      });
+
+      const res = await request(app)
+        .put(`/api/templates/${template._id}`)
+        .set('Authorization', `Bearer ${user2Token}`)
+        .send({ name: 'Hacked' });
+
+      expect(res.status).toBe(403);
+    });
+
+    it('should 404 for missing template', async () => {
+      const fakeId = new mongoose.Types.ObjectId();
+      const res = await request(app)
+        .put(`/api/templates/${fakeId}`)
+        .set('Authorization', `Bearer ${user1Token}`)
+        .send({ name: 'Nope' });
+      expect(res.status).toBe(404);
+    });
+  });
+
   describe('POST /:id/copy', () => {
     it('should copy a template', async () => {
       const template = await WorkoutSequenceTemplate.create({
@@ -228,6 +282,69 @@ describe('Template Routes', () => {
       expect(response.status).toBe(200);
       expect(response.body.selectedTemplates).toHaveLength(1);
       expect(response.body.selectedTemplates[0].toString()).toBe(template._id.toString());
+    });
+
+    it('should ignore selecting templates not owned by the user', async () => {
+      const othersTemplate = await WorkoutSequenceTemplate.create({
+        name: 'Others Template',
+        steps: [],
+        userId: user2._id
+      });
+
+      const res = await request(app)
+        .patch('/api/templates/selected')
+        .set('Authorization', `Bearer ${user1Token}`)
+        .send({ selectedTemplates: [othersTemplate._id] });
+
+      expect(res.status).toBe(200);
+      expect(res.body.selectedTemplates).toHaveLength(0);
+    });
+  });
+
+  describe('DELETE /:id', () => {
+    it('should delete a template the user owns and remove it from the owner\'s selected list', async () => {
+      const template = await WorkoutSequenceTemplate.create({
+        name: 'To Delete',
+        steps: [],
+        userId: user1._id
+      });
+
+      user1.selectedTemplates = [template._id];
+      await user1.save();
+
+      const res = await request(app)
+        .delete(`/api/templates/${template._id}`)
+        .set('Authorization', `Bearer ${user1Token}`);
+
+      expect(res.status).toBe(204);
+
+      const found = await WorkoutSequenceTemplate.findById(template._id);
+      expect(found).toBeNull();
+
+      const updatedUser1 = await User.findById(user1._id);
+      expect(updatedUser1?.selectedTemplates || []).toHaveLength(0);
+    });
+
+    it('should not allow deleting someone else\'s template', async () => {
+      const template = await WorkoutSequenceTemplate.create({
+        name: 'Not Yours',
+        steps: [],
+        userId: user1._id
+      });
+
+      const res = await request(app)
+        .delete(`/api/templates/${template._id}`)
+        .set('Authorization', `Bearer ${user2Token}`);
+
+      expect(res.status).toBe(403);
+    });
+
+    it('should return 404 for missing template', async () => {
+      const fakeId = new mongoose.Types.ObjectId();
+      const res = await request(app)
+        .delete(`/api/templates/${fakeId}`)
+        .set('Authorization', `Bearer ${user1Token}`);
+      expect(res.status).toBe(404);
     });
   });
 });

@@ -23,7 +23,14 @@ router.patch('/selected', authenticateJWT, async (req: AuthRequest, res) => {
     const { selectedTemplates } = req.body;
     const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ error: 'User not found' });
-    user.selectedTemplates = selectedTemplates;
+
+    // Only allow selecting templates owned by the current user
+    const owned = await WorkoutSequenceTemplate.find({
+      _id: { $in: selectedTemplates },
+      userId: req.user.userId,
+    }).select('_id');
+
+    user.selectedTemplates = owned.map((t) => t._id);
     await user.save();
     return res.json({ success: true, selectedTemplates: user.selectedTemplates });
   } catch (error) {
@@ -114,6 +121,72 @@ router.post('/:id/copy', authenticateJWT, async (req: AuthRequest, res) => {
   } catch (error) {
     console.error('Error copying template:', error);
     return res.status(400).json({ error: 'Failed to copy template' });
+  }
+});
+
+router.get('/:id', authenticateJWT, async (req: AuthRequest, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+    const template = await WorkoutSequenceTemplate.findById(req.params.id);
+    if (!template) return res.status(404).json({ error: 'Template not found' });
+    if (template.userId.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+    return res.json(template);
+  } catch (error) {
+    console.error('Error fetching template by id:', error);
+    return res.status(500).json({ error: 'Failed to fetch template' });
+  }
+});
+
+router.put('/:id', authenticateJWT, async (req: AuthRequest, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+    const { name, steps, isPublic } = req.body;
+
+    const template = await WorkoutSequenceTemplate.findById(req.params.id);
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+    if (template.userId.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    // Apply updates; undefined fields are ignored so clients can send partial bodies too
+    if (typeof name !== 'undefined') template.name = name;
+    if (typeof steps !== 'undefined') template.steps = steps;
+    if (typeof isPublic !== 'undefined') template.isPublic = !!isPublic;
+
+    const saved = await template.save();
+    return res.json(saved);
+  } catch (error) {
+    console.error('Error updating template:', error);
+    return res.status(400).json({ error: 'Failed to update template' });
+  }
+});
+
+router.delete('/:id', authenticateJWT, async (req: AuthRequest, res) => {
+  try {
+    if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+
+    const template = await WorkoutSequenceTemplate.findById(req.params.id);
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    if (template.userId.toString() !== req.user.userId) {
+      return res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    await template.deleteOne();
+    await User.findByIdAndUpdate(req.user.userId, {
+      $pull: { selectedTemplates: template._id },
+    });
+
+    return res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting template:', error);
+    return res.status(500).json({ error: 'Failed to delete template' });
   }
 });
 
