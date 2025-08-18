@@ -27,6 +27,25 @@ export default function CreateTemplateScreen({ navigation }: Props) {
     setSteps(steps => steps.map((step, i) => i === idx ? { ...step, [field]: value } : step));
   };
 
+  const handleKindChange = (idx: number, kind: (typeof stepKinds)[number]) => {
+    setSteps(prev => prev.map((step, i) => {
+      if (i !== idx) return step;
+      if (kind === 'rest') {
+        return {
+          ...step,
+          kind: 'rest',
+          name: 'Rest',
+          reps: 1,
+          restDurationSec: 0,
+          notes: '',
+        };
+      }
+      // Leaving rest: allow editing name again; clear default 'Rest' name
+      const newName = step.name === 'Rest' ? '' : step.name;
+      return { ...step, kind, name: newName };
+    }));
+  };
+
   const removeStep = (idx: number) => {
     setSteps(steps => steps.filter((_, i) => i !== idx));
   };
@@ -83,8 +102,9 @@ export default function CreateTemplateScreen({ navigation }: Props) {
             <TextInput
               style={styles.input}
               placeholder="Step Name"
-              value={step.name}
-              onChangeText={v => updateStep(idx, 'name', v)}
+              value={step.kind === 'rest' ? 'Rest' : (step.name || '')}
+              editable={step.kind !== 'rest'}
+              onChangeText={v => { if (step.kind !== 'rest') updateStep(idx, 'name', v); }}
             />
             <View style={styles.row}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -92,7 +112,7 @@ export default function CreateTemplateScreen({ navigation }: Props) {
                   <TouchableOpacity
                     key={kind}
                     style={[styles.kindButton, step.kind === kind && styles.kindButtonSelected]}
-                    onPress={() => updateStep(idx, 'kind', kind)}
+                    onPress={() => handleKindChange(idx, kind)}
                   >
                     <Text style={step.kind === kind ? styles.kindTextSelected : styles.kindText}>{kind}</Text>
                   </TouchableOpacity>
@@ -107,29 +127,33 @@ export default function CreateTemplateScreen({ navigation }: Props) {
               value={step.durationSec?.toString() || ''}
               onChangeText={v => updateStep(idx, 'durationSec', Number(v))}
             />
-            <Text style={styles.fieldLabel}>Repetitions</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Reps"
-              keyboardType="numeric"
-              value={step.reps?.toString() || ''}
-              onChangeText={v => updateStep(idx, 'reps', Number(v))}
-            />
-            <Text style={styles.fieldLabel}>Rest Duration (seconds)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Rest Duration (sec)"
-              keyboardType="numeric"
-              value={step.restDurationSec?.toString() || ''}
-              onChangeText={v => updateStep(idx, 'restDurationSec', Number(v))}
-            />
-            <Text style={styles.fieldLabel}>Notes</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Notes"
-              value={step.notes || ''}
-              onChangeText={v => updateStep(idx, 'notes', v)}
-            />
+            {step.kind !== 'rest' && (
+              <>
+                <Text style={styles.fieldLabel}>Repetitions</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Reps"
+                  keyboardType="numeric"
+                  value={step.reps?.toString() || ''}
+                  onChangeText={v => updateStep(idx, 'reps', Number(v))}
+                />
+                <Text style={styles.fieldLabel}>Rest Duration (seconds)</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Rest Duration (sec)"
+                  keyboardType="numeric"
+                  value={step.restDurationSec?.toString() || ''}
+                  onChangeText={v => updateStep(idx, 'restDurationSec', Number(v))}
+                />
+                <Text style={styles.fieldLabel}>Notes</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Notes"
+                  value={step.notes || ''}
+                  onChangeText={v => updateStep(idx, 'notes', v)}
+                />
+              </>
+            )}
             <TouchableOpacity style={styles.removeButton} onPress={() => removeStep(idx)}>
               <Text style={styles.removeButtonText}>Remove Step</Text>
             </TouchableOpacity>
