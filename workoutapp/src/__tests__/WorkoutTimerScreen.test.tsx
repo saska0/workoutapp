@@ -204,4 +204,151 @@ describe('WorkoutTimerScreen', () => {
       expect(getByTestId('timer-text')).toHaveTextContent('00:02');
     });
   });
+
+  it('starts directly in rest when first step is rest (no preparation)', async () => {
+    const routeFirstRest = {
+      params: {
+        workoutTemplate: {
+          name: 'Rest First',
+          steps: [
+            { name: 'Rest', kind: 'rest' as const, durationSec: 10 },
+            { name: 'exercise1', kind: 'exercise' as const, durationSec: 30, reps: 1, restDurationSec: 0 },
+          ],
+        },
+      },
+    };
+
+    const { getByText, getByTestId } = render(
+      <WorkoutTimerScreen route={routeFirstRest as any} navigation={mockNavigation} />
+    );
+
+    fireEvent.press(getByTestId('start-button'));
+
+    await waitFor(() => {
+      expect(getByText(/Rest Time/)).toBeTruthy();
+      expect(getByTestId('timer-text')).toHaveTextContent('00:10');
+    });
+  });
+
+  it('navigates to a rest step without preparation when next step is rest (skip path)', async () => {
+    const routeNextRest = {
+      params: {
+        workoutTemplate: {
+          name: 'Next Is Rest',
+          steps: [
+            { name: 'exercise1', kind: 'exercise' as const, durationSec: 10, reps: 1, restDurationSec: 0 },
+            { name: 'Rest', kind: 'rest' as const, durationSec: 12 },
+          ],
+        },
+      },
+    };
+
+    const { getByTestId, getByText } = render(
+      <WorkoutTimerScreen route={routeNextRest as any} navigation={mockNavigation} />
+    );
+
+    // prep -> exercise -> next step (rest)
+    fireEvent.press(getByTestId('skip-button')); // enter exercise
+    fireEvent.press(getByTestId('skip-button')); // complete exercise -> should land in rest directly
+
+    await waitFor(() => {
+      expect(getByText(/Rest Time/)).toBeTruthy();
+      expect(getByTestId('timer-text')).toHaveTextContent('00:12');
+    });
+  });
+
+  it('pressing previous on a rest step goes to preparation of previous step', async () => {
+    const routeWithMiddleRest = {
+      params: {
+        workoutTemplate: {
+          name: 'Prev From Rest',
+          steps: [
+            { name: 'exercise1', kind: 'exercise' as const, durationSec: 10, reps: 1, restDurationSec: 0 },
+            { name: 'Rest', kind: 'rest' as const, durationSec: 7 },
+            { name: 'exercise2', kind: 'exercise' as const, durationSec: 10, reps: 1, restDurationSec: 0 },
+          ],
+        },
+      },
+    };
+
+    const { getByTestId, getByText } = render(
+      <WorkoutTimerScreen route={routeWithMiddleRest as any} navigation={mockNavigation} />
+    );
+
+    // Move to rest step
+    fireEvent.press(getByTestId('skip-button')); // prep -> exercise1
+    fireEvent.press(getByTestId('skip-button')); // exercise1 -> rest step
+
+    await waitFor(() => {
+      expect(getByText(/Rest Time/)).toBeTruthy();
+    });
+
+    // Go back from rest -> should go to preparation of previous step
+    fireEvent.press(getByTestId('previous-button'));
+
+    await waitFor(() => {
+      expect(getByText(/Get Ready/)).toBeTruthy();
+      expect(getByText('00:05')).toBeTruthy();
+    });
+  });
+
+  it('intra-exercise rest flips to preparation when reaching preparation threshold', async () => {
+    const routeWithIntraRest = {
+      params: {
+        workoutTemplate: {
+          name: 'Intra Rest',
+          steps: [
+            { name: 'exercise1', kind: 'exercise' as const, durationSec: 5, reps: 2, restDurationSec: 8 },
+          ],
+        },
+      },
+    };
+
+    const { getByTestId, getByText } = render(
+      <WorkoutTimerScreen route={routeWithIntraRest as any} navigation={mockNavigation} />
+    );
+
+    fireEvent.press(getByTestId('start-button'));
+
+    // Move to exercise immediately
+    fireEvent.press(getByTestId('skip-button'));
+
+    // Finish first rep -> go to rest (8s)
+    fireEvent.press(getByTestId('skip-button'));
+
+    // Advance time so the rest reaches 5 seconds remaining, then one more tick to flip to prepare
+    jest.advanceTimersByTime(4000);
+
+    await waitFor(() => {
+      expect(getByText(/Get Ready/)).toBeTruthy();
+      expect(getByTestId('timer-text')).toHaveTextContent('00:05');
+    });
+  });
+
+  it('no rest between reps defaults to preparation', async () => {
+    const routeNoRestBetweenReps = {
+      params: {
+        workoutTemplate: {
+          name: 'No Rest Between Reps',
+          steps: [
+            { name: 'exercise1', kind: 'exercise' as const, durationSec: 5, reps: 2, restDurationSec: 0 },
+          ],
+        },
+      },
+    };
+
+    const { getByTestId, getByText } = render(
+      <WorkoutTimerScreen route={routeNoRestBetweenReps as any} navigation={mockNavigation} />
+    );
+
+    // prep -> exercise1
+    fireEvent.press(getByTestId('skip-button'));
+    // exercise1 rep1 -> next phase (no rest configured, should go to preparation)
+    fireEvent.press(getByTestId('skip-button'));
+
+    await waitFor(() => {
+      expect(getByText(/Get Ready/)).toBeTruthy();
+      expect(getByTestId('timer-text')).toHaveTextContent('00:05');
+    });
+  });
 }); 

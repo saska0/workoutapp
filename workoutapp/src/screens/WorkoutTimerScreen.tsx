@@ -60,7 +60,7 @@ const createInitialState = (): WorkoutTimerState => ({
   currentRep: 1,
   isInRest: false,
   isInPrepare: true,
-  timeRemaining: 5,
+  timeRemaining: PREPARATION_TIME_SEC,
   isPaused: false,
   isActive: false,
   totalElapsedTime: 0,
@@ -76,6 +76,17 @@ const workoutTimerReducer = (
 
   switch (action.type) {
     case 'START_TIMER':
+      // If the very first step is a standalone rest step, skip preparation
+      if (currentStep?.kind === 'rest') {
+        return {
+          ...state,
+          isActive: true,
+          isPaused: false,
+          isInPrepare: false,
+          isInRest: true,
+          timeRemaining: currentStep?.durationSec || 0,
+        };
+      }
       return {
         ...state,
         isActive: true,
@@ -95,20 +106,8 @@ const workoutTimerReducer = (
       };
 
     case 'TICK':
-      if (state.timeRemaining <= 1) {
-        // Handle state transitions when timer reaches zero
-        if (state.isInPrepare) {
-          // Preparation finished, start the exercise
-          return {
-            ...state,
-            isInPrepare: false,
-            timeRemaining: currentStep?.durationSec || 0,
-            totalElapsedTime: state.totalElapsedTime + 1,
-          };
-        } else if (state.isInRest) {
-          // Rest period finished, start preparation for next rep or next step
-          if (state.currentRep < (currentStep?.reps || 1)) {
-            // Start preparation for next rep of same exercise
+      // Transition from intra-exercise rest to preparation when only PREPARATION_TIME_SEC remains
+      if (state.isInRest && currentStep?.kind !== 'rest' && state.timeRemaining === PREPARATION_TIME_SEC) {
             return {
               ...state,
               isInRest: false,
@@ -116,64 +115,116 @@ const workoutTimerReducer = (
               timeRemaining: PREPARATION_TIME_SEC,
               totalElapsedTime: state.totalElapsedTime + 1,
             };
-          } else {
-            if (isLastStep) {
-              return {
-                ...state,
-                isActive: false,
-                timeRemaining: 0,
-                totalElapsedTime: state.totalElapsedTime + 1,
-              };
-            } else {
-              return {
-                ...state,
-                currentStepIndex: state.currentStepIndex + 1,
-                currentRep: 1,
-                isInRest: false,
-                isInPrepare: true,
-                timeRemaining: PREPARATION_TIME_SEC,
-                totalElapsedTime: state.totalElapsedTime + 1,
-              };
-            }
           }
-        } else {
-          // Exercise finished, start rest period if there are more reps
+      if (state.timeRemaining <= 1) {
+        if (state.isInPrepare) {
+          return {
+            ...state,
+            isInPrepare: false,
+            timeRemaining: currentStep?.durationSec || 0,
+            totalElapsedTime: state.totalElapsedTime + 1,
+          };
+        }
+        if (state.isInRest) {
           if (state.currentRep < (currentStep?.reps || 1)) {
             return {
               ...state,
-              isInRest: true,
-              timeRemaining: currentStep?.restDurationSec || 10,
+              isInRest: false,
+              isInPrepare: true,
+              timeRemaining: PREPARATION_TIME_SEC,
               totalElapsedTime: state.totalElapsedTime + 1,
             };
-          } else {
-            // Move to next step
-            if (isLastStep) {
-              // Workout complete
-              return {
-                ...state,
-                isActive: false,
-                timeRemaining: 0,
-                totalElapsedTime: state.totalElapsedTime + 1,
-              };
-            } else {
+          }
+          if (isLastStep) {
+            return {
+              ...state,
+              isActive: false,
+              timeRemaining: 0,
+              totalElapsedTime: state.totalElapsedTime + 1,
+            };
+          }
+          // Move to next step; if next is a rest step, go directly into rest (no preparation)
+          {
+            const nextStep = workoutTemplate.steps[state.currentStepIndex + 1];
+            if (nextStep?.kind === 'rest') {
               return {
                 ...state,
                 currentStepIndex: state.currentStepIndex + 1,
                 currentRep: 1,
-                timeRemaining: workoutTemplate.steps[state.currentStepIndex + 1].durationSec || 0,
+                isInRest: true,
+                isInPrepare: false,
+                timeRemaining: nextStep.durationSec || 0,
                 totalElapsedTime: state.totalElapsedTime + 1,
               };
             }
+            return {
+              ...state,
+              currentStepIndex: state.currentStepIndex + 1,
+              currentRep: 1,
+              isInRest: false,
+              isInPrepare: true,
+              timeRemaining: PREPARATION_TIME_SEC,
+              totalElapsedTime: state.totalElapsedTime + 1,
+            };
           }
         }
-      } else {
-        // Regular tick - just decrement timer
-        return {
-          ...state,
-          timeRemaining: state.timeRemaining - 1,
-          totalElapsedTime: state.totalElapsedTime + 1,
-        };
+        // End of exercise
+        if (state.currentRep < (currentStep?.reps || 1)) {
+          const rest = currentStep?.restDurationSec ?? 0;
+          if (rest > PREPARATION_TIME_SEC) {
+            return {
+              ...state,
+              isInRest: true,
+              timeRemaining: rest,
+              totalElapsedTime: state.totalElapsedTime + 1,
+            };
+          }
+          // No or short rest: straight to preparation
+          return {
+            ...state,
+            isInPrepare: true,
+            timeRemaining: PREPARATION_TIME_SEC,
+            totalElapsedTime: state.totalElapsedTime + 1,
+          };
+        }
+        if (isLastStep) {
+          return {
+            ...state,
+            isActive: false,
+            timeRemaining: 0,
+            totalElapsedTime: state.totalElapsedTime + 1,
+          };
+        }
+        {
+          const nextStep = workoutTemplate.steps[state.currentStepIndex + 1];
+          if (nextStep?.kind === 'rest') {
+            return {
+              ...state,
+              currentStepIndex: state.currentStepIndex + 1,
+              currentRep: 1,
+              isInRest: true,
+              isInPrepare: false,
+              timeRemaining: nextStep.durationSec || 0,
+              totalElapsedTime: state.totalElapsedTime + 1,
+            };
+          }
+          return {
+            ...state,
+            currentStepIndex: state.currentStepIndex + 1,
+            currentRep: 1,
+            isInPrepare: true,
+            isInRest: false,
+            timeRemaining: PREPARATION_TIME_SEC,
+            totalElapsedTime: state.totalElapsedTime + 1,
+          };
+        }
       }
+      // Regular tick
+      return {
+        ...state,
+        timeRemaining: state.timeRemaining - 1,
+        totalElapsedTime: state.totalElapsedTime + 1,
+      };
 
     case 'SKIP_STEP':
       if (state.isInPrepare) {
@@ -213,11 +264,21 @@ const workoutTimerReducer = (
       } else {
         // During exercise: skip to rest period or next exercise
         if (state.currentRep < (currentStep?.reps || 1)) {
-          // Start rest period before next rep
+          // Start rest period before next rep, unless restDurationSec is 0 -> go to preparation
+          const rest = currentStep?.restDurationSec ?? 0;
+          if (rest > 0) {
+            return {
+              ...state,
+              isInRest: true,
+              timeRemaining: rest,
+            };
+          }
+          // No rest configured: go straight to preparation
           return {
             ...state,
-            isInRest: true,
-            timeRemaining: currentStep?.restDurationSec || 10,
+            isInPrepare: true,
+            isInRest: false,
+            timeRemaining: PREPARATION_TIME_SEC,
           };
         } else {
           // Move to next exercise
@@ -227,6 +288,17 @@ const workoutTimerReducer = (
               timeRemaining: 0,
             };
           } else {
+            const nextStep = workoutTemplate.steps[state.currentStepIndex + 1];
+            if (nextStep?.kind === 'rest') {
+              return {
+                ...state,
+                currentStepIndex: state.currentStepIndex + 1,
+                currentRep: 1,
+                isInRest: true,
+                isInPrepare: false,
+                timeRemaining: nextStep.durationSec || 0,
+              };
+            }
             return {
               ...state,
               currentStepIndex: state.currentStepIndex + 1,
@@ -239,6 +311,28 @@ const workoutTimerReducer = (
       }
 
     case 'GO_BACK':
+      // If current step is a standalone rest step, go to preparation of the previous step
+      if (currentStep?.kind === 'rest') {
+        if (state.currentStepIndex > 0) {
+          return {
+            ...state,
+            isPaused: true,
+            isInPrepare: true,
+            isInRest: false,
+            currentStepIndex: state.currentStepIndex - 1,
+            currentRep: 1,
+            timeRemaining: PREPARATION_TIME_SEC,
+          };
+        }
+        // No previous step; just ensure we're in prepare state
+        return {
+          ...state,
+          isPaused: true,
+          isInPrepare: true,
+          isInRest: false,
+          timeRemaining: PREPARATION_TIME_SEC,
+        };
+      }
       const baseBackState = {
         ...state,
         isPaused: true,
@@ -256,6 +350,17 @@ const workoutTimerReducer = (
         } else if (state.currentStepIndex > 0) {
           // Go to previous step's last rep
           const prevStep = workoutTemplate.steps[state.currentStepIndex - 1];
+          if (prevStep?.kind === 'rest') {
+            return {
+              ...state,
+              isPaused: true,
+              isInPrepare: false,
+              isInRest: true,
+              currentStepIndex: state.currentStepIndex - 1,
+              currentRep: prevStep.reps || 1,
+              timeRemaining: prevStep.durationSec || 0,
+            };
+          }
           return {
             ...baseBackState,
             currentStepIndex: state.currentStepIndex - 1,
@@ -383,7 +488,7 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
 
         <View style={styles.exerciseContainer}>
           <Text style={styles.exerciseName}>
-            {state.isInPrepare ? 'Prepare for Exercise' : state.isInRest ? 'Rest' : currentStep?.name}
+            {state.isInPrepare ? 'Prepare' : state.isInRest ? 'Rest' : currentStep?.name}
           </Text>
           {state.isInPrepare ? (
             <Text style={styles.exerciseDescription}>
