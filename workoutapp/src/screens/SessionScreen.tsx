@@ -1,10 +1,14 @@
-import React, { useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import { RootStackParamList } from '../types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import TileBlock from '../components/TileBlock';
 import { useSessionTimer } from '../context/SessionTimerContext';
 import { colors, typography } from '../theme';
+import { fetchSelectedTemplates } from '../api/templates';
+import { getAuthToken } from '../api/auth';
+import { useFocusEffect } from '@react-navigation/native';
+import type { WorkoutTemplate } from '../types/workout';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Session'>;
 
@@ -22,10 +26,43 @@ function formatSessionTime(seconds: number): string {
 
 export default function SessionScreen({ navigation }: Props) {
   const { elapsedSec, startSession, endSession, isRunning } = useSessionTimer();
+  const [selectedWorkouts, setSelectedWorkouts] = useState<WorkoutTemplate[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isRunning) startSession();
   }, []);
+
+  const loadSelected = useCallback(async () => {
+    // Show spinner only if we don't have any items yet
+    setLoading(selectedWorkouts.length === 0);
+    setError(null);
+    try {
+      const token = await getAuthToken();
+      if (!token) throw new Error('No auth token');
+      const data = await fetchSelectedTemplates(token);
+      setSelectedWorkouts(data || []);
+    } catch (e: any) {
+      setError(e?.message || 'Failed to load selected workouts');
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedWorkouts.length]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadSelected();
+    }, [loadSelected])
+  );
+
+  const chunkIntoRows = (items: WorkoutTemplate[], size = 2) => {
+    const rows: WorkoutTemplate[][] = [];
+    for (let i = 0; i < items.length; i += size) {
+      rows.push(items.slice(i, i + size));
+    }
+    return rows;
+  };
 
   return (
     <View style={styles.container}>
@@ -34,60 +71,41 @@ export default function SessionScreen({ navigation }: Props) {
       </Text>
       
       <ScrollView style={styles.scrollView}>
-        <View style={styles.row}>
-          <TileBlock 
-            title="Stretch 1" 
-            onPress={() => navigation.navigate('WorkoutTimer', {
-              workoutTemplate: {
-                name: 'Stretch 1',
-                steps: [
-                  {
-                    name: '1',
-                    kind: 'stretch',
-                    durationSec: 30,
-                    reps: 3,
-                    restDurationSec: 15,
-                    notes: '111'
-                  },
-                  {
-                    name: '2',
-                    kind: 'stretch',
-                    durationSec: 45,
-                    reps: 2,
-                    restDurationSec: 20,
-                    notes: '222'
-                  },
-                  {
-                    name: '3',
-                    kind: 'stretch',
-                    durationSec: 30,
-                    reps: 3,
-                    restDurationSec: 10,
-                    notes: '333'
-                  },
-                  {
-                    name: '4',
-                    kind: 'stretch',
-                    durationSec: 40,
-                    reps: 2,
-                    restDurationSec: 25,
-                    notes: '444'
-                  },
-                  {
-                    name: '5',
-                    kind: 'stretch',
-                    durationSec: 35,
-                    reps: 3,
-                    restDurationSec: 12,
-                    notes: '555'
+        {error && (
+          <Text style={{ color: colors.text.error, marginBottom: 10 }}>{error}</Text>
+        )}
+        {loading && selectedWorkouts.length === 0 && (
+          <ActivityIndicator size="large" color={colors.text.primary} />
+        )}
+        {!loading && selectedWorkouts.length === 0 && !error && (
+          <Text style={{ color: colors.text.secondary, textAlign: 'center', marginVertical: 10 }}>
+            No workouts selected. Tap Edit to choose workouts.
+          </Text>
+        )}
+        {selectedWorkouts.length > 0 && (
+          chunkIntoRows(selectedWorkouts, 2).map((row, idx) => (
+            <View key={idx} style={styles.row}>
+              {row.map((workout) => (
+                <TileBlock
+                  key={workout._id}
+                  title={workout.name}
+                  onPress={() =>
+                    navigation.navigate('WorkoutTimer', {
+                      workoutTemplate: {
+                        userId: workout.userId,
+                        name: workout.name,
+                        steps: workout.steps,
+                      },
+                    })
                   }
-                ]
-              }
-            })} 
-            style={styles.tileBlock} 
-          />
-          <TileBlock title="Stretch 2" onPress={() => console.log('Stretch 2')} style={styles.tileBlock} />
-        </View>
+                  style={styles.tileBlock}
+                />
+              ))}
+              {row.length === 1 && <View style={[styles.tileBlock, styles.invisibleTile]} />}
+            </View>
+          ))
+        )}
+
         <View style={styles.row}>
           <TileBlock title="Edit" onPress={() => navigation.navigate('EditMenu')} style={styles.tileBlock} />
         </View>
@@ -128,6 +146,9 @@ const styles = StyleSheet.create({
   },
   tileBlock: {
     backgroundColor: colors.background.secondary,
+  },
+  invisibleTile: {
+    opacity: 0,
   },
   endSessionTile: {
     backgroundColor: colors.button.deactivated,
