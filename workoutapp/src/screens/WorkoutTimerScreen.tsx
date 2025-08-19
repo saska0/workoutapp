@@ -643,9 +643,9 @@ const styles = StyleSheet.create({
   },
   timerText: {
     color: colors.text.primary,
-    fontSize: 72,
+    fontSize: typography.fontSize.timerxl,
     fontWeight: typography.fontWeight.bold,
-    fontFamily: 'monospace',
+    fontFamily: typography.fontFamily.monospace,
   },
   exerciseContainer: {
     alignItems: 'center',

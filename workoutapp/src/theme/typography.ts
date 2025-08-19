@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 export const typography = {
   fontSize: {
     xs: 12,
@@ -5,7 +7,8 @@ export const typography = {
     md: 16,
     lg: 18,
     title: 32,
-    timer: 24,
+    timer: 48,
+    timerxl: 72,
   },
   
   fontWeight: {
@@ -13,6 +16,10 @@ export const typography = {
     medium: '500',
     semibold: '600',
     bold: 'bold',
+  },
+
+  fontFamily: {
+    monospace: Platform.OS === 'ios' ? 'Menlo' : Platform.OS === 'android' ? 'monospace' : 'Courier New',
   },
 } as const;
 

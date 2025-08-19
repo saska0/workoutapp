@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Modal, Pressable, Animated, PanResponder, Dimensions } from 'react-native';
 import { RootStackParamList } from '../types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import TileBlock from '../components/TileBlock';
@@ -25,14 +25,77 @@ function formatSessionTime(seconds: number): string {
 }
 
 export default function SessionScreen({ navigation }: Props) {
-  const { elapsedSec, startSession, endSession, isRunning } = useSessionTimer();
+  const { elapsedSec, startSession, isRunning } = useSessionTimer();
   const [selectedWorkouts, setSelectedWorkouts] = useState<WorkoutTemplate[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [endModalVisible, setEndModalVisible] = useState(false);
+
+  // Bottom sheet animation and gesture
+  const sheetTranslateY = useRef(new Animated.Value(0)).current;
+  const screenHeight = Dimensions.get('window').height;
+  const sheetHeight = Math.round(screenHeight * 0.45);
+
+  const closeEndSheet = useCallback(() => {
+    Animated.timing(sheetTranslateY, {
+      toValue: sheetHeight,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setEndModalVisible(false));
+  }, [sheetHeight, sheetTranslateY]);
+
 
   useEffect(() => {
     if (!isRunning) startSession();
   }, []);
+
+  // Animate sheet in when modal opens
+  useEffect(() => {
+    if (endModalVisible) {
+      sheetTranslateY.setValue(sheetHeight);
+      Animated.timing(sheetTranslateY, {
+        toValue: 0,
+        duration: 220,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [endModalVisible, sheetHeight, sheetTranslateY]);
+
+  // Swipe down to close
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onStartShouldSetPanResponderCapture: () => false,
+      onMoveShouldSetPanResponder: (_evt, gesture) =>
+        Math.abs(gesture.dy) > Math.abs(gesture.dx) && gesture.dy > 8,
+      onMoveShouldSetPanResponderCapture: (_evt, gesture) =>
+        Math.abs(gesture.dy) > Math.abs(gesture.dx) && gesture.dy > 8,
+      onPanResponderMove: (_evt, gesture) => {
+        if (gesture.dy > 0) sheetTranslateY.setValue(gesture.dy);
+      },
+      onPanResponderRelease: (_evt, gesture) => {
+        if (gesture.dy > sheetHeight * 0.33 || gesture.vy > 0.9) {
+          Animated.timing(sheetTranslateY, {
+            toValue: sheetHeight,
+            duration: 180,
+            useNativeDriver: true,
+          }).start(() => setEndModalVisible(false));
+        } else {
+          Animated.spring(sheetTranslateY, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+      onPanResponderTerminationRequest: () => true,
+      onPanResponderTerminate: () => {
+        Animated.spring(sheetTranslateY, {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+      },
+    })
+  ).current;
 
   const loadSelected = useCallback(async () => {
     // Show spinner only if we don't have any items yet
@@ -112,14 +175,33 @@ export default function SessionScreen({ navigation }: Props) {
         <View style={styles.row}>
           <TileBlock
             title="End Session"
-            onPress={() => {
-              endSession();
-              navigation.navigate('Main');
-            }}
+            onPress={() => setEndModalVisible(true)}
             style={styles.endSessionTile}
           />
         </View>
       </ScrollView>
+
+      <Modal
+        animationType="fade"
+        transparent
+        visible={endModalVisible}
+        onRequestClose={closeEndSheet}
+      >
+        <View style={styles.modalOverlay} {...panResponder.panHandlers}>
+          <Pressable style={styles.modalBackdrop} onPress={closeEndSheet} />
+          <Animated.View
+            style={[styles.modalContainer, { transform: [{ translateY: sheetTranslateY }] }]}
+          >
+            <View style={styles.modalButtonsRow}>
+              <TileBlock title="Add Notes" onPress={() => {}} style={styles.modalButtonSecondary} />
+            </View>
+            <View style={styles.modalButtonsRow}>
+              <TileBlock title="Discard" onPress={() => {}} style={styles.modalButtonSecondary} />
+              <TileBlock title="Log Session" onPress={() => {}} />
+            </View>
+          </Animated.View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -132,10 +214,15 @@ const styles = StyleSheet.create({
   },
   timer: {
     fontSize: typography.fontSize.timer,
+    fontFamily: typography.fontFamily.monospace,
+    fontWeight: typography.fontWeight.bold,
     marginBottom: 20,
-    marginTop: 40,
+    marginTop: 50,
     color: colors.text.primary,
     textAlign: 'center',
+    width: 200,
+    alignSelf: 'center',
+    backgroundColor: 'transparent',
   },
   scrollView: {
     flex: 1,
@@ -152,5 +239,35 @@ const styles = StyleSheet.create({
   },
   endSessionTile: {
     backgroundColor: colors.button.deactivated,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    flex: 1,
+  },
+  modalContainer: {
+    height: '45%',
+    backgroundColor: colors.background.primary,
+    padding: 20,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  modalButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  modalButtonSecondary: {
+    backgroundColor: colors.background.secondary,
+  },
+  modalTitle: {
+    fontSize: typography.fontSize.title,
+    color: colors.text.primary,
+    textAlign: 'center',
+    marginTop: 12,
+    marginBottom: 36,
   },
 });

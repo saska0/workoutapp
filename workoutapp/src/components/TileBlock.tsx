@@ -20,7 +20,7 @@ export default function TileBlock({ title, onPress, style }: TileBlockProps) {
 
 const styles = StyleSheet.create({
   tile: {
-    backgroundColor: colors.button.primary,
+    backgroundColor: colors.button.activated,
     padding: 20,
     borderRadius: 8,
     justifyContent: 'center',
