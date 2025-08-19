@@ -7,6 +7,7 @@ import { useSessionTimer } from '../context/SessionTimerContext';
 import { colors, typography } from '../theme';
 import { fetchSelectedTemplates } from '../api/templates';
 import { getAuthToken } from '../api/auth';
+import { postSession, type SessionData } from '../api/sessions';
 import { useFocusEffect } from '@react-navigation/native';
 import type { WorkoutTemplate } from '../types/workout';
 
@@ -25,11 +26,21 @@ function formatSessionTime(seconds: number): string {
 }
 
 export default function SessionScreen({ navigation }: Props) {
-  const { elapsedSec, startSession, isRunning } = useSessionTimer();
+  const { 
+    elapsedSec, 
+    startSession, 
+    isRunning, 
+    startTime: sessionStartTime, 
+    completedWorkouts, 
+    clearCompletedWorkouts,
+    resetSession
+  } = useSessionTimer();
   const [selectedWorkouts, setSelectedWorkouts] = useState<WorkoutTemplate[]>([]);
+  const [sessionNotes, setSessionNotes] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [endModalVisible, setEndModalVisible] = useState(false);
+  const [isLoggingSession, setIsLoggingSession] = useState(false);
 
   // Bottom sheet animation and gesture
   const sheetTranslateY = useRef(new Animated.Value(0)).current;
@@ -43,6 +54,41 @@ export default function SessionScreen({ navigation }: Props) {
       useNativeDriver: true,
     }).start(() => setEndModalVisible(false));
   }, [sheetHeight, sheetTranslateY]);
+
+  const handleLogSession = useCallback(async () => {
+    setIsLoggingSession(true);
+    try {
+      const token = await getAuthToken();
+      if (!token) throw new Error('No auth token');
+
+      const sessionData: SessionData = {
+        startedAt: sessionStartTime || new Date(),
+        endedAt: new Date(),
+        completedWorkouts,
+        notes: sessionNotes.trim() || undefined,
+      };
+
+      await postSession(token, sessionData);
+      
+      clearCompletedWorkouts();
+      resetSession();
+      setSessionNotes('');
+      closeEndSheet();
+      navigation.navigate('Main');
+    } catch (error: any) {
+      setError(error?.message || 'Failed to log session');
+    } finally {
+      setIsLoggingSession(false);
+    }
+  }, [completedWorkouts, sessionNotes, elapsedSec, sessionStartTime, clearCompletedWorkouts, resetSession, closeEndSheet, navigation]);
+
+  const handleDiscardSession = useCallback(() => {
+    clearCompletedWorkouts();
+    resetSession();
+    setSessionNotes('');
+    closeEndSheet();
+    navigation.navigate('Main');
+  }, [clearCompletedWorkouts, resetSession, closeEndSheet, navigation]);
 
 
   useEffect(() => {
@@ -155,6 +201,7 @@ export default function SessionScreen({ navigation }: Props) {
                   onPress={() =>
                     navigation.navigate('WorkoutTimer', {
                       workoutTemplate: {
+                        _id: workout._id,
                         userId: workout.userId,
                         name: workout.name,
                         steps: workout.steps,
@@ -193,12 +240,31 @@ export default function SessionScreen({ navigation }: Props) {
             style={[styles.modalContainer, { transform: [{ translateY: sheetTranslateY }] }]}
           >
             <View style={styles.modalButtonsRow}>
-              <TileBlock title="Add Notes" onPress={() => {}} />
+              <TileBlock 
+                title="Add Notes" 
+                onPress={() => {
+                  // TODO: Add notes functionality
+                  console.log('Add notes pressed');
+                }} 
+              />
             </View>
             <View style={styles.modalButtonsRow}>
-              <TileBlock title="Discard" onPress={() => {}} style={styles.modalButtonDiscard} />
-              <TileBlock title="Log Session" onPress={() => {}} style={styles.modalButtonLog} />
+              <TileBlock 
+                title="Discard" 
+                onPress={handleDiscardSession} 
+                style={styles.modalButtonDiscard} 
+              />
+              <TileBlock 
+                title={isLoggingSession ? "Logging..." : "Log Session"} 
+                onPress={handleLogSession} 
+                style={styles.modalButtonLog}
+              />
             </View>
+            {completedWorkouts.length > 0 && (
+              <Text style={styles.completedCount}>
+                {completedWorkouts.length} workout{completedWorkouts.length !== 1 ? 's' : ''} completed
+              </Text>
+            )}
           </Animated.View>
         </View>
       </Modal>
@@ -272,5 +338,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 12,
     marginBottom: 36,
+  },
+  completedCount: {
+    fontSize: typography.fontSize.xs,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    marginTop: 16,
   },
 });

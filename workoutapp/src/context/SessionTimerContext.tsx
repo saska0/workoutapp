@@ -1,11 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { CompletedWorkout } from '../api/sessions';
 
-type SessionTimerContextType = {
+export type SessionTimerContextType = {
   startTime: Date | null;
   isRunning: boolean;
   startSession: () => void;
   endSession: () => void;
+  resetSession: () => void;
   elapsedSec: number;
+  completedWorkouts: CompletedWorkout[];
+  addCompletedWorkout: (workout: CompletedWorkout) => void;
+  clearCompletedWorkouts: () => void;
 };
 
 const SessionTimerContext = createContext<SessionTimerContextType | undefined>(undefined);
@@ -14,6 +19,7 @@ export const SessionTimerProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [elapsedSec, setElapsedSec] = useState(0);
+  const [completedWorkouts, setCompletedWorkouts] = useState<CompletedWorkout[]>([]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -39,8 +45,32 @@ export const SessionTimerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     setElapsedSec(0);
   };
 
+  const resetSession = () => {
+    setIsRunning(false);
+    setStartTime(null);
+    setElapsedSec(0);
+  };
+
+  const addCompletedWorkout = (workout: CompletedWorkout) => {
+    setCompletedWorkouts(prev => [...prev, workout]);
+  };
+
+  const clearCompletedWorkouts = () => {
+    setCompletedWorkouts([]);
+  };
+
   return (
-    <SessionTimerContext.Provider value={{ startTime, isRunning, startSession, endSession, elapsedSec }}>
+    <SessionTimerContext.Provider value={{ 
+      startTime, 
+      isRunning, 
+      startSession, 
+      endSession, 
+      resetSession, 
+      elapsedSec,
+      completedWorkouts,
+      addCompletedWorkout,
+      clearCompletedWorkouts
+    }}>
       {children}
     </SessionTimerContext.Provider>
   );

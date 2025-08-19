@@ -16,7 +16,7 @@ const SessionSchema = new mongoose.Schema(
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     startedAt: { type: Date, required: true },
     endedAt: { type: Date, required: true },
-    location: { type: String }, // free-text location entered by user
+    notes: { type: String }, // free-text notes entered by user
     completedWorkouts: { type: [CompletedWorkoutSchema], default: [] },
   },
   { timestamps: true }

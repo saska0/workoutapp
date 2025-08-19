@@ -9,10 +9,12 @@ import {
 } from 'react-native';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import type { CompletedWorkout } from '../api/sessions';
+import { useSessionTimer } from '../context/SessionTimerContext';
 
 interface WorkoutStep {
   name: string;
-  kind: 'prepare' | 'rest' | 'stretch' | 'exercise' | 'custom';
+  kind: 'rest' | 'stretch' | 'exercise';
   durationSec?: number;
   reps?: number;
   restDurationSec?: number;
@@ -24,6 +26,7 @@ interface WorkoutTimerProps {
   route: {
     params: {
       workoutTemplate: {
+        _id: string;
         userId?: string;
         name: string;
         steps: WorkoutStep[];
@@ -390,6 +393,7 @@ const workoutTimerReducer = (
 
 const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) => {
   const { workoutTemplate } = route.params;
+  const { addCompletedWorkout } = useSessionTimer();
   
   const [state, dispatch] = useReducer(
     (state: WorkoutTimerState, action: WorkoutTimerAction) => 
@@ -425,9 +429,25 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
   useEffect(() => {
     if (isWorkoutComplete && state.isActive) {
       dispatch({ type: 'COMPLETE_WORKOUT' });
-      Alert.alert('Workout Complete!', 'Great job! You\'ve finished your workout.');
+      
+      // Create completed workout data
+      const workoutStartTime = new Date(Date.now() - state.totalElapsedTime * 1000);
+      const workoutEndTime = new Date();
+      
+      const completedWorkout: CompletedWorkout = {
+        templateId: workoutTemplate._id,
+        name: workoutTemplate.name,
+        startedAt: workoutStartTime,
+        endedAt: workoutEndTime,
+        durationSec: state.totalElapsedTime,
+      };
+      addCompletedWorkout(completedWorkout);
+      
+      Alert.alert('Workout Complete!', 'Great job! You\'ve finished your workout.', [
+        { text: 'OK', onPress: () => navigation.goBack() }
+      ]);
     }
-  }, [isWorkoutComplete, state.isActive]);
+  }, [isWorkoutComplete, state.isActive, addCompletedWorkout, workoutTemplate, state.totalElapsedTime, navigation]);
 
   const startTimer = () => {
     dispatch({ type: 'START_TIMER' });

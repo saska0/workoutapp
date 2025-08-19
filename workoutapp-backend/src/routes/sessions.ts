@@ -15,14 +15,14 @@ type CompletedWorkoutInput = {
 type CreateSessionBody = {
   startedAt: string | Date;
   endedAt: string | Date;
-  location?: string;
+  notes?: string;
   completedWorkouts?: CompletedWorkoutInput[];
 };
 
 router.post('/', authenticateJWT, async (req: AuthRequest, res) => {
   try {
   if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
-  const { startedAt, endedAt, location, completedWorkouts = [] } = (req.body || {}) as CreateSessionBody;
+  const { startedAt, endedAt, notes, completedWorkouts = [] } = (req.body || {}) as CreateSessionBody;
 
     if (!startedAt || !endedAt) {
       return res.status(400).json({ error: 'startedAt and endedAt are required' });
@@ -54,7 +54,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res) => {
       userId: req.user.userId,
       startedAt: sAt,
       endedAt: eAt,
-      location,
+      notes,
       completedWorkouts: mappedWorkouts,
     });
 

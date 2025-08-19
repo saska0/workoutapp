@@ -7,11 +7,12 @@ export type RootStackParamList = {
   Register: undefined;
   WorkoutTimer: {
     workoutTemplate: {
+      _id: string;
       userId?: string;
       name: string;
       steps: Array<{
         name: string;
-        kind: 'prepare' | 'rest' | 'stretch' | 'exercise' | 'custom';
+        kind: 'rest' | 'stretch' | 'exercise';
         durationSec?: number;
         reps?: number;
         restDurationSec?: number;
