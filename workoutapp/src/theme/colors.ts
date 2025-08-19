@@ -23,6 +23,7 @@ export const colors = {
     activated: '#237e48ff',
     deactivated: '#862c2cff',
     dark: '#111111',
+    tileDefault: '#222222',
   },
   
   input: {

@@ -22,15 +22,15 @@ export default function MainMenuScreen({ navigation }: Props) {
         </TouchableOpacity>
       </View>
       <View style={styles.row}>
-        <TileBlock title="Start Session" onPress={() => navigation.navigate('Session')} style={styles.tileBlock} />
-        <TileBlock title="Calendar" onPress={() => {}} style={styles.tileBlock} />
+        <TileBlock title="Start Session" onPress={() => navigation.navigate('Session')} />
+        <TileBlock title="Calendar" onPress={() => {}} />
       </View>
       <View style={styles.row}>
-        <TileBlock title="Analytics" onPress={() => {}} style={styles.tileBlock} />
+        <TileBlock title="Analytics" onPress={() => {}} />
       </View>
       <View style={styles.row}>
-        <TileBlock title="Edit" onPress={() => navigation.navigate('EditMenu')} style={styles.tileBlock} />
-        <TileBlock title="Settings" onPress={() => console.log('Settings')} style={styles.tileBlock} />
+        <TileBlock title="Edit" onPress={() => navigation.navigate('EditMenu')} />
+        <TileBlock title="Settings" onPress={() => console.log('Settings')}/>
       </View>
     </View>
   )
@@ -47,10 +47,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  tileBlock: {
-    backgroundColor: colors.background.secondary,
-  },
-
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

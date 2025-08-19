@@ -193,11 +193,11 @@ export default function SessionScreen({ navigation }: Props) {
             style={[styles.modalContainer, { transform: [{ translateY: sheetTranslateY }] }]}
           >
             <View style={styles.modalButtonsRow}>
-              <TileBlock title="Add Notes" onPress={() => {}} style={styles.modalButtonSecondary} />
+              <TileBlock title="Add Notes" onPress={() => {}} />
             </View>
             <View style={styles.modalButtonsRow}>
-              <TileBlock title="Discard" onPress={() => {}} style={styles.modalButtonSecondary} />
-              <TileBlock title="Log Session" onPress={() => {}} />
+              <TileBlock title="Discard" onPress={() => {}} style={styles.modalButtonDiscard} />
+              <TileBlock title="Log Session" onPress={() => {}} style={styles.modalButtonLog} />
             </View>
           </Animated.View>
         </View>
@@ -260,8 +260,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  modalButtonSecondary: {
-    backgroundColor: colors.background.secondary,
+  modalButtonLog: {
+    backgroundColor: colors.button.activated,
+  },
+  modalButtonDiscard: {
+    backgroundColor: colors.button.deactivated,
   },
   modalTitle: {
     fontSize: typography.fontSize.title,
