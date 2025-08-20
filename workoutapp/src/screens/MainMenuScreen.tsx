@@ -4,11 +4,21 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { removeAuthToken } from '../api/auth';
 import { colors, typography } from '../theme';
+import { useUserSessions } from '../context/SessionsContext';
+import { useEffect } from 'react';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
 export default function MainMenuScreen({ navigation }: Props) {
+  const { fetchSessions, clearSessions } = useUserSessions();
+
+  // Fetch all user sessions when main menu loads
+  useEffect(() => {
+    fetchSessions();
+  }, []);
+
   const handleLogout = async () => {
+    clearSessions();
     await removeAuthToken();
     navigation.replace('Welcome');
   };
@@ -23,7 +33,7 @@ export default function MainMenuScreen({ navigation }: Props) {
       </View>
       <View style={styles.row}>
         <TileBlock title="Start Session" onPress={() => navigation.navigate('Session')} />
-        <TileBlock title="Calendar" onPress={() => {}} />
+        <TileBlock title="Calendar" onPress={() => navigation.navigate('Calendar')} />
       </View>
       <View style={styles.row}>
         <TileBlock title="Analytics" onPress={() => {}} />

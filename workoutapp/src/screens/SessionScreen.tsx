@@ -4,6 +4,7 @@ import { RootStackParamList } from '../types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import TileBlock from '../components/TileBlock';
 import { useSessionTimer } from '../context/SessionTimerContext';
+import { useUserSessions } from '../context/SessionsContext';
 import { colors, typography } from '../theme';
 import { fetchSelectedTemplates } from '../api/templates';
 import { getAuthToken } from '../api/auth';
@@ -35,6 +36,7 @@ export default function SessionScreen({ navigation }: Props) {
     clearCompletedWorkouts,
     resetSession
   } = useSessionTimer();
+  const { addSession } = useUserSessions();
   const [selectedWorkouts, setSelectedWorkouts] = useState<WorkoutTemplate[]>([]);
   const [sessionNotes, setSessionNotes] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
@@ -68,7 +70,11 @@ export default function SessionScreen({ navigation }: Props) {
         notes: sessionNotes.trim() || undefined,
       };
 
-      await postSession(token, sessionData);
+      const result = await postSession(token, sessionData);
+      
+      if (result) {
+        addSession(result);
+      }
       
       clearCompletedWorkouts();
       resetSession();

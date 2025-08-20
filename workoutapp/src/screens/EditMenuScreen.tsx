@@ -94,7 +94,6 @@ export default function EditMenuScreen({ navigation }: Props) {
   const handleEditWorkout = () => {
     setMenuModalVisible(false);
     if (selectedWorkoutForMenu) {
-      console.log(selectedWorkoutForMenu._id);
       navigation.navigate('EditTemplate', { templateId: selectedWorkoutForMenu._id });
     }
   };
@@ -145,7 +144,7 @@ export default function EditMenuScreen({ navigation }: Props) {
       
       <View style={styles.tileRow}>
         <TileBlock title="Create" onPress={() => navigation.navigate('CreateTemplate')} style={styles.tileBlock} />
-  <TileBlock title="Browse" onPress={() => navigation.navigate('BrowseTemplates')} style={styles.tileBlock} />
+        <TileBlock title="Browse" onPress={() => navigation.navigate('BrowseTemplates')} style={styles.tileBlock} />
       </View>
       {loading ? (
         <ActivityIndicator testID="loading-indicator" size="large" color={colors.text.primary} />

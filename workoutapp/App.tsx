@@ -1,4 +1,5 @@
 import { SessionTimerProvider } from './src/context/SessionTimerContext';
+import { SessionsProvider } from './src/context/SessionsContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet, View } from 'react-native';
@@ -14,12 +15,15 @@ import EditMenuScreen from '@screens/EditMenuScreen';
 import CreateTemplateScreen from './src/screens/CreateTemplateScreen';
 import EditTemplateScreen from './src/screens/EditTemplateScreen';
 import BrowseTemplatesScreen from './src/screens/BrowseTemplatesScreen';
+import CalendarScreen from './src/screens/CalendarScreen';
+import AgendaScreen from './src/screens/AgendaScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+    <SessionsProvider>
     <SessionTimerProvider>
       <View style={styles.container}>
         <NavigationContainer>
@@ -114,10 +118,29 @@ export default function App() {
                 animation: 'slide_from_right',
               }} 
             />
+            <Stack.Screen 
+              name="Calendar" 
+              component={CalendarScreen} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_bottom',
+              }} 
+            />
+            <Stack.Screen 
+              name="Agenda" 
+              component={AgendaScreen} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_right',
+              }} 
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </View> 
     </SessionTimerProvider>
+    </SessionsProvider>
     </GestureHandlerRootView>
   );
 }
