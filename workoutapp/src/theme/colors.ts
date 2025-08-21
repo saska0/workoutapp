@@ -13,7 +13,7 @@ export const colors = {
   },
   
   border: {
-    primary: '#444444',
+    primary: '#000000',
     error: '#ff6b6b',
   },
   

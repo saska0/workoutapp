@@ -8,6 +8,7 @@ import SwipeableRow from '../components/SwipeableRow';
 import { fetchUserTemplates, fetchSelectedTemplates, updateSelectedTemplates, deleteTemplate } from '../api/templates';
 import { getAuthToken } from '../api/auth';
 import TileBlock from '@components/TileBlock';
+import WideButton from '../components/WideButton';
 import { colors, typography } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditMenu'>;
@@ -143,8 +144,8 @@ export default function EditMenuScreen({ navigation }: Props) {
       </View>
       
       <View style={styles.tileRow}>
-        <TileBlock title="Create" onPress={() => navigation.navigate('CreateTemplate')} style={styles.tileBlock} />
-        <TileBlock title="Browse" onPress={() => navigation.navigate('BrowseTemplates')} style={styles.tileBlock} />
+        <TileBlock title="Create" onPress={() => navigation.navigate('CreateTemplate')} />
+        <TileBlock title="Browse" onPress={() => navigation.navigate('BrowseTemplates')} />
       </View>
       {loading ? (
         <ActivityIndicator testID="loading-indicator" size="large" color={colors.text.primary} />
@@ -185,25 +186,27 @@ export default function EditMenuScreen({ navigation }: Props) {
               {selectedWorkoutForMenu?.name}
             </Text>
             
-            <TouchableOpacity style={styles.modalButton} onPress={handleEditWorkout}>
-              <Text style={styles.modalButtonText}>Edit</Text>
-            </TouchableOpacity>
+            <WideButton 
+              title="Edit" 
+              onPress={handleEditWorkout}
+              backgroundColor={colors.button.dark}
+              style={styles.wideButton}
+            />
             
-            <TouchableOpacity 
-              style={[
-                styles.modalButton, 
-                deleteConfirmation ? styles.confirmDeleteButton : styles.deleteButton
-              ]} 
+            <WideButton 
+              title={deleteConfirmation ? 'Confirm Delete' : 'Delete'}
               onPress={handleDeleteWorkout}
-            >
-              <Text style={[styles.modalButtonText, styles.deleteButtonText]}>
-                {deleteConfirmation ? 'Confirm Delete' : 'Delete'}
-              </Text>
-            </TouchableOpacity>
+              backgroundColor={deleteConfirmation ? colors.button.deactivated : colors.button.dark}
+              style={styles.wideButton}
+            />
             
-            <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
+            <WideButton 
+              title="Cancel" 
+              onPress={closeModal}
+              textColor={colors.text.secondary}
+              backgroundColor={colors.button.tileDefault}
+              style={styles.wideButton}
+            />
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
@@ -245,9 +248,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 10,
   },
-  tileBlock: {
-    backgroundColor: colors.background.secondary,
-  },
   scrollView: {
     flex: 1,
     marginTop: 10,
@@ -262,6 +262,8 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: colors.background.secondary,
     borderRadius: 12,
+    borderWidth: 3,
+    borderColor: colors.border.primary,
     padding: 24,
     width: '80%',
     maxWidth: 300,
@@ -308,5 +310,11 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: typography.fontSize.md,
     textAlign: 'center',
+  },
+  cancelButtonStyle: {
+    marginTop: 8,
+  },
+  wideButton: {
+    marginBottom: 10,
   },
 });

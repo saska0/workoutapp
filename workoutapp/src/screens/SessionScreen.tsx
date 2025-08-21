@@ -214,22 +214,21 @@ export default function SessionScreen({ navigation }: Props) {
                       },
                     })
                   }
-                  style={styles.tileBlock}
                 />
               ))}
-              {row.length === 1 && <View style={[styles.tileBlock, styles.invisibleTile]} />}
+              {row.length === 1 && <View/>}
             </View>
           ))
         )}
 
         <View style={styles.row}>
-          <TileBlock title="Edit" onPress={() => navigation.navigate('EditMenu')} style={styles.tileBlock} />
+          <TileBlock title="Edit" onPress={() => navigation.navigate('EditMenu')} />
         </View>
         <View style={styles.row}>
           <TileBlock
             title="End Session"
             onPress={() => setEndModalVisible(true)}
-            style={styles.endSessionTile}
+            tileColor={colors.button.deactivated}
           />
         </View>
       </ScrollView>
@@ -258,12 +257,12 @@ export default function SessionScreen({ navigation }: Props) {
               <TileBlock 
                 title="Discard" 
                 onPress={handleDiscardSession} 
-                style={styles.modalButtonDiscard} 
+                tileColor={colors.button.deactivated}
               />
               <TileBlock 
                 title={isLoggingSession ? "Logging..." : "Log Session"} 
                 onPress={handleLogSession} 
-                style={styles.modalButtonLog}
+                tileColor={colors.button.activated}
               />
             </View>
             {completedWorkouts.length > 0 && (
@@ -309,9 +308,6 @@ const styles = StyleSheet.create({
   invisibleTile: {
     opacity: 0,
   },
-  endSessionTile: {
-    backgroundColor: colors.button.deactivated,
-  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
@@ -331,12 +327,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  modalButtonLog: {
-    backgroundColor: colors.button.activated,
-  },
-  modalButtonDiscard: {
-    backgroundColor: colors.button.deactivated,
   },
   modalTitle: {
     fontSize: typography.fontSize.title,

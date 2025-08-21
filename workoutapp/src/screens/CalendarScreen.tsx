@@ -65,7 +65,7 @@ export default function CalendarScreen() {
 		completedDatesSet.forEach(date => {
 			marked[date] = {
 				selected: true,
-				selectedColor: colors.button.activated,
+				selectedColor: colors.border.primary,
 			};
 		});
 		return marked;
@@ -93,10 +93,8 @@ export default function CalendarScreen() {
 					backgroundColor: colors.background.secondary,
 					calendarBackground: colors.background.secondary,
 					textSectionTitleColor: colors.text.secondary,
-					todayTextColor: colors.button.primary,
 					dayTextColor: colors.text.primary,
 					textDisabledColor: colors.text.placeholder,
-					dotColor: colors.button.primary,
 					arrowColor: colors.text.primary,
 					monthTextColor: colors.text.primary,
 					textMonthFontWeight: typography.fontWeight.semibold as any,
@@ -120,6 +118,8 @@ const styles = StyleSheet.create({
       paddingBottom: 12,
       paddingTop: 3,
       backgroundColor: colors.background.primary,
+	  borderBottomWidth: 5,
+	  borderColor: colors.border.primary,
     },
     backButton: {
       padding: 8,
@@ -137,6 +137,6 @@ const styles = StyleSheet.create({
 		textAlign: 'center'
 	},
 	spacer: { width: 31 },
-	calendar: { backgroundColor: colors.background.primary },
+	calendar: { backgroundColor: colors.background.secondary },
 });
 

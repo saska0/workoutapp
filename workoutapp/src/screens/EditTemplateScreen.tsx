@@ -13,7 +13,6 @@ const stepKinds = ['exercise', 'stretch', 'rest'] as const;
 
 export default function EditTemplateScreen({ navigation, route }: Props) {
   const { templateId } = route.params;
-  console.log('Editing template with ID:', templateId);
   const [name, setName] = useState('');
   const [steps, setSteps] = useState<WorkoutStep[]>([]);
   const [loading, setLoading] = useState(true);
