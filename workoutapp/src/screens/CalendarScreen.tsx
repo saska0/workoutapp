@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CalendarList } from 'react-native-calendars';
+import { Feather } from '@expo/vector-icons';
 import { colors, typography } from '../theme';
 import { useNavigation } from '@react-navigation/native';
 import { useUserSessions } from '../context/SessionsContext';
@@ -75,7 +76,7 @@ export default function CalendarScreen() {
 		<SafeAreaView style={styles.safeArea}>
 			<View style={styles.header}> 
 				<TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-				  <Text style={styles.backButtonText}>✕</Text>
+				  <Feather name="x" size={20} color={colors.text.primary} />
 				</TouchableOpacity>
 				<Text style={styles.title}>Calendar</Text>
 				<View style={styles.spacer} />
@@ -123,11 +124,6 @@ const styles = StyleSheet.create({
     },
     backButton: {
       padding: 8,
-    },
-    backButtonText: {
-      color: colors.text.primary,
-      fontSize: typography.fontSize.lg,
-      fontWeight: typography.fontWeight.bold,
     },
 	title: { 
 		color: colors.text.primary, 

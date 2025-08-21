@@ -32,15 +32,15 @@ export default function MainMenuScreen({ navigation }: Props) {
         </TouchableOpacity>
       </View>
       <View style={styles.row}>
-        <TileBlock title="Start Session" onPress={() => navigation.navigate('Session')} />
-        <TileBlock title="Calendar" onPress={() => navigation.navigate('Calendar')} />
+        <TileBlock title="Start Session" iconName='play' onPress={() => navigation.navigate('Session')} />
+        <TileBlock title="Calendar" iconName='calendar' onPress={() => navigation.navigate('Calendar')} />
       </View>
       <View style={styles.row}>
-        <TileBlock title="Analytics" onPress={() => {}} />
+        <TileBlock title="Analytics" iconName='bar-chart' onPress={() => {}} />
       </View>
       <View style={styles.row}>
-        <TileBlock title="Edit" onPress={() => navigation.navigate('EditMenu')} />
-        <TileBlock title="Settings" onPress={() => console.log('Settings')}/>
+        <TileBlock title="Edit" iconName='edit' onPress={() => navigation.navigate('EditMenu')} />
+        <TileBlock title="Settings" iconName='settings' onPress={() => console.log('Settings')}/>
       </View>
     </View>
   )

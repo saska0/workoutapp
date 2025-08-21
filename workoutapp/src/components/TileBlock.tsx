@@ -1,5 +1,6 @@
 import { Pressable, Text, StyleSheet, ViewStyle, Animated, View } from 'react-native'
 import { useRef } from 'react'
+import { Feather } from '@expo/vector-icons'
 import { colors, typography } from '../theme';
 
 type TileBlockProps = {
@@ -7,9 +8,18 @@ type TileBlockProps = {
   onPress: () => void
   style?: ViewStyle
   tileColor?: string
+  iconName?: keyof typeof Feather.glyphMap
+  iconColor?: string
 }
 
-export default function TileBlock({ title, onPress, style, tileColor = colors.button.tileDefault }: TileBlockProps) {
+export default function TileBlock({ 
+  title, 
+  onPress, 
+  style, 
+  tileColor = colors.button.tileDefault, 
+  iconName = 'box',
+  iconColor = colors.text.primary
+}: TileBlockProps) {
   const tileOffsetX = useRef(new Animated.Value(0)).current
   const tileOffsetY = useRef(new Animated.Value(0)).current
 
@@ -66,6 +76,9 @@ export default function TileBlock({ title, onPress, style, tileColor = colors.bu
           onPressOut={handlePressOut}
           style={[styles.tile, { backgroundColor: tileColor }]}
         >
+          <View style={styles.iconContainer}>
+            <Feather name={iconName} size={48} color={iconColor} />
+          </View>
           <Text style={styles.title}>{title}</Text>
         </Pressable>
       </Animated.View>
@@ -102,12 +115,19 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: colors.border.primary,
   },
+  iconContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
   pressed: {
     opacity: 0.7,
   },
   title: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.semibold,
+    fontSize: typography.fontSize.sm,
+    fontWeight: typography.fontWeight.medium,
+    textAlign: 'center',
   },
 })

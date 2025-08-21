@@ -6,10 +6,10 @@ import { WorkoutStep } from '../types/workout';
 import { getAuthToken } from '../api/auth';
 import { colors, typography } from '../theme';
 import { fetchTemplateById, updateTemplate } from '../api/templates';
+import WideButton from '../components/WideButton';
+import StepForm from '../components/StepForm';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditTemplate'>;
-
-const stepKinds = ['exercise', 'stretch', 'rest'] as const;
 
 export default function EditTemplateScreen({ navigation, route }: Props) {
   const { templateId } = route.params;
@@ -35,7 +35,7 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
     setSteps((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  const handleKindChange = (idx: number, kind: (typeof stepKinds)[number]) => {
+  const handleKindChange = (idx: number, kind: 'exercise' | 'stretch' | 'rest') => {
     setSteps(prev => prev.map((step, i) => {
       if (i !== idx) return step;
       if (kind === 'rest') {
@@ -118,83 +118,36 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
             value={name}
             onChangeText={setName}
           />
-          {steps.map((step, idx) => (
-            <View key={idx} style={styles.stepContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Step Name"
-                value={step.kind === 'rest' ? 'Rest' : (step.name || '')}
-                editable={step.kind !== 'rest'}
-                onChangeText={(v) => { if (step.kind !== 'rest') updateStep(idx, 'name', v); }}
-              />
-              <View style={styles.row}>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {stepKinds.map((kind) => (
-                    <TouchableOpacity
-                      key={kind}
-                      style={[styles.kindButton, step.kind === kind && styles.kindButtonSelected]}
-            onPress={() => handleKindChange(idx, kind as any)}
-                    >
-                      <Text style={step.kind === kind ? styles.kindTextSelected : styles.kindText}>{kind}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-              </View>
-              <Text style={styles.fieldLabel}>Duration (seconds)</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Duration (sec)"
-                keyboardType="numeric"
-                value={step.durationSec?.toString() || ''}
-                onChangeText={(v) => updateStep(idx, 'durationSec', Number(v))}
-              />
-              {step.kind !== 'rest' && (
-                <>
-                  <Text style={styles.fieldLabel}>Repetitions</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Reps"
-                    keyboardType="numeric"
-                    value={step.reps?.toString() || ''}
-                    onChangeText={(v) => updateStep(idx, 'reps', Number(v))}
-                  />
-                  <Text style={styles.fieldLabel}>Rest Duration (seconds)</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Rest Duration (sec)"
-                    keyboardType="numeric"
-                    value={step.restDurationSec?.toString() || ''}
-                    onChangeText={(v) => updateStep(idx, 'restDurationSec', Number(v))}
-                  />
-                  <Text style={styles.fieldLabel}>Notes</Text>
-                  <TextInput
-                    style={styles.input}
-                    placeholder="Notes"
-                    value={step.notes || ''}
-                    onChangeText={(v) => updateStep(idx, 'notes', v)}
-                  />
-                </>
-              )}
-              <TouchableOpacity style={styles.removeButton} onPress={() => removeStep(idx)}>
-                <Text style={styles.removeButtonText}>Remove Step</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-          <TouchableOpacity style={styles.addButton} onPress={addStep}>
-            <Text style={styles.addButtonText}>+ Add Step</Text>
-          </TouchableOpacity>
+          
+          <StepForm
+            steps={steps}
+            onUpdateStep={updateStep}
+            onRemoveStep={removeStep}
+            onKindChange={handleKindChange}
+          />
+          
+          <WideButton 
+            title="+ Add Step" 
+            onPress={addStep}
+            backgroundColor={colors.button.tileDefault}
+            style={styles.wideButtonSpacing}
+          />
+          
           {error && (
             <View style={styles.errorContainer}>
               <Text style={styles.error}>{error}</Text>
             </View>
           )}
-          <TouchableOpacity
-            style={[styles.submitButton, saving && styles.buttonDisabled]}
+          
+          <WideButton 
+            title={saving ? 'Saving...' : 'Save'}
             onPress={handleSave}
-            disabled={saving}
-          >
-            <Text style={styles.submitButtonText}>{saving ? 'Saving...' : 'Save'}</Text>
-          </TouchableOpacity>
+            backgroundColor={colors.button.activated}
+            style={StyleSheet.flatten([
+              styles.wideButtonSpacing, 
+              saving && styles.buttonDisabled
+            ])}
+          />
         </ScrollView>
       )}
     </View>
@@ -246,19 +199,6 @@ const styles = StyleSheet.create({
     padding: 20,
     flexGrow: 1,
   },
-  stepContainer: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-  },
-  fieldLabel: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.sm,
-    fontWeight: typography.fontWeight.semibold,
-    marginBottom: 4,
-    marginTop: 8,
-  },
   input: {
     backgroundColor: colors.input.background,
     borderRadius: 8,
@@ -266,8 +206,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     fontSize: typography.fontSize.md,
     color: colors.text.primary,
-    borderWidth: 1,
-    borderColor: colors.input.border,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
     marginBottom: 8,
   },
   row: {
@@ -276,17 +216,24 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   kindButton: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 6,
     backgroundColor: colors.background.primary,
-    marginRight: 6,
-    borderWidth: 1,
-    borderColor: colors.input.border,
+    marginRight: 8,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
+    shadowColor: colors.border.primary,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    elevation: 0,
   },
   kindButtonSelected: {
     backgroundColor: colors.button.activated,
-    borderColor: colors.button.activated,
+    borderColor: colors.border.primary,
+    transform: [{ translateX: 2 }, { translateY: 2 }],
+    shadowOffset: { width: 0, height: 0 },
   },
   kindText: {
     color: colors.text.primary,
@@ -306,39 +253,19 @@ const styles = StyleSheet.create({
     color: colors.text.error,
     fontWeight: 'bold',
   },
-  addButton: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
+  wideButtonSpacing: {
     marginBottom: 10,
   },
-  addButtonText: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.semibold,
-  },
-  submitButton: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.bold,
-  },
   buttonDisabled: {
-    backgroundColor: colors.button.disabled,
+    opacity: 0.6,
   },
   errorContainer: {
     backgroundColor: colors.background.secondary,
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.text.error,
+    borderWidth: 3,
+    borderColor: colors.border.primary,
   },
   error: {
     color: colors.text.error,

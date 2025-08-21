@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Feather } from '@expo/vector-icons';
 import { RootStackParamList } from '../types/navigation';
 import { colors, typography } from '../theme';
 import { fetchSharedTemplates, copyTemplate } from '../api/templates';
@@ -73,7 +74,7 @@ export default function BrowseTemplatesScreen({ navigation }: Props) {
       <View style={styles.header}>
         <View style={styles.headerSideLeft}>
           <TouchableOpacity style={styles.iconButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.backButtonText}>✕</Text>
+            <Feather name="x" size={20} color={colors.text.primary} />
           </TouchableOpacity>
         </View>
         {showSearch ? (
@@ -105,11 +106,12 @@ export default function BrowseTemplatesScreen({ navigation }: Props) {
         <View style={[styles.headerSideRight, showSearch && styles.headerSideRightCollapsed]}>
           {!showSearch && (
             <TouchableOpacity style={styles.iconButton} onPress={() => setShowSearch(true)}>
-              <Text style={styles.searchIcon}>🔍</Text>
+              <Feather name="search" size={20} color={colors.text.primary} />
             </TouchableOpacity>
           )}
         </View>
       </View>
+      <View style={styles.headerBorder} />
 
       {loading ? (
         <ActivityIndicator size="large" color={colors.text.primary} />
@@ -161,9 +163,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingBottom: 0,
+    paddingBottom: 10,
     position: 'relative',
-    height: 39,
+    height: 49,
+  },
+  headerBorder: {
+    height: 3,
+    backgroundColor: colors.border.primary,
+    marginHorizontal: 10,
   },
   headerSide: {
     flexDirection: 'row',
@@ -187,16 +194,6 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   backButton: { padding: 8 },
-  backButtonText: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.bold,
-  },
-  searchIcon: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.bold,
-  },
   headerTitle: {
     color: colors.text.primary,
     fontSize: typography.fontSize.lg,

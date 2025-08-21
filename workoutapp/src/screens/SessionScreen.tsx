@@ -222,11 +222,12 @@ export default function SessionScreen({ navigation }: Props) {
         )}
 
         <View style={styles.row}>
-          <TileBlock title="Edit" onPress={() => navigation.navigate('EditMenu')} />
+          <TileBlock title="Edit" iconName='edit' onPress={() => navigation.navigate('EditMenu')} />
         </View>
         <View style={styles.row}>
           <TileBlock
             title="End Session"
+            iconName='stop-circle'
             onPress={() => setEndModalVisible(true)}
             tileColor={colors.button.deactivated}
           />
@@ -246,7 +247,8 @@ export default function SessionScreen({ navigation }: Props) {
           >
             <View style={styles.modalButtonsRow}>
               <TileBlock 
-                title="Add Notes" 
+                title="Add Notes"
+                iconName='edit-2'
                 onPress={() => {
                   // TODO: Add notes functionality
                   console.log('Add notes pressed');
@@ -256,11 +258,13 @@ export default function SessionScreen({ navigation }: Props) {
             <View style={styles.modalButtonsRow}>
               <TileBlock 
                 title="Discard" 
+                iconName='trash-2'
                 onPress={handleDiscardSession} 
                 tileColor={colors.button.deactivated}
               />
               <TileBlock 
                 title={isLoggingSession ? "Logging..." : "Log Session"} 
+                iconName='check-circle'
                 onPress={handleLogSession} 
                 tileColor={colors.button.activated}
               />

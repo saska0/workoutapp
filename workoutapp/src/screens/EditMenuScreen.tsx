@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text, ScrollView, TouchableOpacity, Modal } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useFocusEffect } from '@react-navigation/native';
+import { Feather } from '@expo/vector-icons';
 import { RootStackParamList } from '../types/navigation';
 import MenuRow from '../components/MenuRow';
 import SwipeableRow from '../components/SwipeableRow';
@@ -137,15 +138,15 @@ export default function EditMenuScreen({ navigation }: Props) {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>✕</Text>
+          <Feather name="x" size={20} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Workouts</Text>
         <View style={styles.headerSpacer} />
       </View>
       
       <View style={styles.tileRow}>
-        <TileBlock title="Create" onPress={() => navigation.navigate('CreateTemplate')} />
-        <TileBlock title="Browse" onPress={() => navigation.navigate('BrowseTemplates')} />
+        <TileBlock title="Create" iconName='plus' onPress={() => navigation.navigate('CreateTemplate')} />
+        <TileBlock title="Browse" iconName='search' onPress={() => navigation.navigate('BrowseTemplates')} />
       </View>
       {loading ? (
         <ActivityIndicator testID="loading-indicator" size="large" color={colors.text.primary} />
@@ -229,11 +230,6 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 8,
-  },
-  backButtonText: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.bold,
   },
   headerTitle: {
     color: colors.text.primary,

@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import type { CompletedWorkout } from '../api/sessions';
@@ -547,7 +548,7 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
            onPress={goBack}
            testID="previous-button"
          >
-          <Text style={styles.controlButtonText}>prev</Text>
+          <Feather name="skip-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
 
         {!state.isActive ? (
@@ -556,7 +557,7 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
             onPress={startTimer}
             testID="start-button"
           >
-            <Text style={styles.controlButtonText}>play</Text>
+            <Feather name="play" size={24} color={colors.text.primary} />
           </TouchableOpacity>
         ) : state.isPaused ? (
           <TouchableOpacity
@@ -564,7 +565,7 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
             onPress={resumeTimer}
             testID="resume-button"
           >
-            <Text style={styles.controlButtonText}>play</Text>
+            <Feather name="play" size={24} color={colors.text.primary} />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -572,7 +573,7 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
             onPress={pauseTimer}
             testID="pause-button"
           >
-            <Text style={styles.controlButtonText}>pause</Text>
+            <Feather name="pause" size={24} color={colors.text.primary} />
           </TouchableOpacity>
         )}
 
@@ -582,7 +583,7 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
           disabled={isWorkoutComplete}
           testID="skip-button"
         >
-          <Text style={styles.controlButtonText}>next</Text>
+          <Feather name="skip-forward" size={24} color={colors.text.primary} />
         </TouchableOpacity>
       </View>
 
@@ -697,6 +698,8 @@ const styles = StyleSheet.create({
     width: 90,
     height: 90,
     borderRadius: 45,
+    borderWidth: 3,
+    borderColor: colors.border.primary,
   },
   statLabel: {
     color: colors.text.secondary,
@@ -737,9 +740,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 10,
     backgroundColor: colors.background.secondary,
-  },
-  controlButtonText: {
-    color: colors.text.primary,
+    borderWidth: 3,
+    borderColor: colors.border.primary,
   },
   statusContainer: {
     alignItems: 'center',
