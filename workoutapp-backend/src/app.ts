@@ -3,6 +3,7 @@ dotenv.config();
 import express from 'express';
 import templatesRouter from './routes/templates';
 import sessionsRouter from './routes/sessions';
+import userProgressRouter from './routes/userProgress';
 import { connectToDatabase } from './db';
 import authRouter from './routes/auth';
 
@@ -12,6 +13,7 @@ connectToDatabase();
 
 app.use('/api/templates', templatesRouter);
 app.use('/api/sessions', sessionsRouter);
+app.use('/api/progress', userProgressRouter);
 app.use('/api/auth', authRouter);
 
 export default app;
