@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { getAuthToken } from '../api/auth';
 import { colors, typography } from '../theme';
+import WideButton from '../components/WideButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Welcome'>;
 
@@ -48,18 +43,17 @@ export default function WelcomeScreen({ navigation }: Props) {
       <View style={styles.content}>
         <Text style={styles.title}>Welcome to WorkoutApp</Text>
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
-            style={styles.primaryButton} 
+          <WideButton 
+            title="Get Started"
             onPress={() => navigation.navigate('Register')}
-          >
-            <Text style={styles.primaryButtonText}>Get Started</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.secondaryButton} 
+            backgroundColor={colors.button.dark}
+          />
+          <WideButton 
+            title="Sign In"
             onPress={() => navigation.navigate('Login')}
-          >
-            <Text style={styles.secondaryButtonText}>Sign In</Text>
-          </TouchableOpacity>
+            backgroundColor={colors.button.tileDefault}
+            textColor={colors.text.secondary}
+          />
         </View>
       </View>
     </View>
@@ -87,33 +81,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    gap: 16,
-  },
-  primaryButton: {
-    backgroundColor: colors.button.primary,
-    paddingHorizontal: 40,
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.semibold,
-  },
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: 40,
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.button.primary,
-  },
-  secondaryButtonText: {
-    color: colors.button.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.semibold,
+    gap: 12,
   },
   loadingText: {
     color: colors.text.primary,

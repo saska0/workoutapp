@@ -1,20 +1,11 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, Alert, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { login, storeAuthToken } from '../api/auth';
 import { colors, typography } from '../theme';
+import WideButton from '../components/WideButton';
+import NeoInput from '../components/NeoInput';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -98,49 +89,38 @@ export default function LoginScreen({ navigation }: Props) {
         <View style={styles.form}>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={[styles.input, errors.email && styles.inputError]}
-              placeholder="Enter your email"
-              placeholderTextColor={colors.text.placeholder}
+            <NeoInput
               value={formData.email}
               onChangeText={(value) => updateFormData('email', value)}
+              placeholder="Enter your email"
               keyboardType="email-address"
-              keyboardAppearance="dark"
+              error={!!errors.email}
+              autoCapitalize="none"
             />
             {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={[styles.input, errors.password && styles.inputError]}
-              placeholder="Enter your password"
-              placeholderTextColor={colors.text.placeholder}
+            <NeoInput
               value={formData.password}
               onChangeText={(value) => updateFormData('password', value)}
+              placeholder="Enter your password"
               secureTextEntry
-              keyboardAppearance="dark"
+              error={!!errors.password}
             />
             {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
           </View>
 
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
+          <WideButton
+            title={isLoading ? 'Signing In...' : 'Sign In'}
             onPress={handleLogin}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.text.primary} />
-            ) : (
-              <Text style={styles.buttonText}>Sign In</Text>
-            )}
-          </TouchableOpacity>
+            backgroundColor={isLoading ? colors.button.disabled : colors.button.dark}
+          />
 
           <View style={styles.registerContainer}>
             <Text style={styles.registerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.registerLink}>Create Account</Text>
-            </TouchableOpacity>
+            <Text onPress={() => navigation.navigate('Register')} style={styles.registerLink}>Create Account</Text>
           </View>
         </View>
       </ScrollView>
@@ -161,7 +141,8 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
+    marginTop: 10,
   },
   title: {
     fontSize: typography.fontSize.title,
@@ -186,39 +167,10 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: 8,
   },
-  input: {
-    backgroundColor: colors.input.background,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: typography.fontSize.md,
-    color: colors.text.primary,
-    borderWidth: 1,
-    borderColor: colors.input.border,
-  },
-  inputError: {
-    borderColor: colors.input.borderError,
-  },
   errorText: {
     color: colors.text.error,
     fontSize: typography.fontSize.sm,
     marginTop: 4,
-  },
-  button: {
-    backgroundColor: colors.button.primary,
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  buttonDisabled: {
-    backgroundColor: colors.button.disabled,
-  },
-  buttonText: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
-    fontWeight: typography.fontWeight.semibold,
   },
   registerContainer: {
     flexDirection: 'row',
@@ -228,6 +180,7 @@ const styles = StyleSheet.create({
   registerText: {
     color: colors.text.secondary,
     fontSize: typography.fontSize.md,
+    paddingVertical: 12,
   },
   registerLink: {
     color: colors.button.primary,

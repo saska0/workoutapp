@@ -12,6 +12,7 @@ import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import type { CompletedWorkout } from '../api/sessions';
 import { useSessionTimer } from '../context/SessionTimerContext';
+import CircularButton from '../components/CircularButton';
 
 interface WorkoutStep {
   name: string;
@@ -493,7 +494,7 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Text style={styles.backButtonText}>✕</Text>
+          <Feather name="x" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.workoutName}>{workoutTemplate.name}</Text>
         <View style={styles.placeholder} />
@@ -543,48 +544,43 @@ const WorkoutTimerScreen: React.FC<WorkoutTimerProps> = ({ route, navigation }) 
       </View>
 
       <View style={styles.controlsContainer}>
-        <TouchableOpacity
-           style={[styles.controlButton, styles.backButton]}
-           onPress={goBack}
-           testID="previous-button"
-         >
-          <Feather name="skip-back" size={24} color={colors.text.primary} />
-        </TouchableOpacity>
+        <CircularButton
+          iconName="skip-back"
+          onPress={goBack}
+          style={styles.controlButtonSpacing}
+          testID="previous-button"
+        />
 
         {!state.isActive ? (
-          <TouchableOpacity
-            style={[styles.controlButton]}
+          <CircularButton
+            iconName="play"
             onPress={startTimer}
+            style={styles.controlButtonSpacing}
             testID="start-button"
-          >
-            <Feather name="play" size={24} color={colors.text.primary} />
-          </TouchableOpacity>
+          />
         ) : state.isPaused ? (
-          <TouchableOpacity
-            style={[styles.controlButton]}
+          <CircularButton
+            iconName="play"
             onPress={resumeTimer}
+            style={styles.controlButtonSpacing}
             testID="resume-button"
-          >
-            <Feather name="play" size={24} color={colors.text.primary} />
-          </TouchableOpacity>
+          />
         ) : (
-          <TouchableOpacity
-            style={[styles.controlButton]}
+          <CircularButton
+            iconName="pause"
             onPress={pauseTimer}
+            style={styles.controlButtonSpacing}
             testID="pause-button"
-          >
-            <Feather name="pause" size={24} color={colors.text.primary} />
-          </TouchableOpacity>
+          />
         )}
 
-        <TouchableOpacity
-          style={[styles.controlButton]}
+        <CircularButton
+          iconName="skip-forward"
           onPress={skipStep}
           disabled={isWorkoutComplete}
+          style={styles.controlButtonSpacing}
           testID="skip-button"
-        >
-          <Feather name="skip-forward" size={24} color={colors.text.primary} />
-        </TouchableOpacity>
+        />
       </View>
 
       <View style={styles.statusContainer}>
@@ -618,10 +614,6 @@ const styles = StyleSheet.create({
   },
   backButton: {
     padding: 10,
-  },
-  backButtonText: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.md,
   },
   workoutName: {
     color: colors.text.primary,
@@ -732,16 +724,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 30,
   },
-  controlButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
+  controlButtonSpacing: {
     marginHorizontal: 10,
-    backgroundColor: colors.background.secondary,
-    borderWidth: 3,
-    borderColor: colors.border.primary,
   },
   statusContainer: {
     alignItems: 'center',
