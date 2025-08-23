@@ -5,6 +5,7 @@ export type RootStackParamList = {
   EditMenu: undefined;
   Login: undefined;
   Register: undefined;
+  Metrics: undefined;
   Calendar: undefined;
   Agenda: { selectedDate?: string };
   WorkoutTimer: {

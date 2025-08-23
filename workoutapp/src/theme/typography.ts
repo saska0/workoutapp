@@ -6,6 +6,7 @@ export const typography = {
     sm: 14,
     md: 16,
     lg: 18,
+    title_s: 24,
     title: 32,
     timer: 48,
     timerxl: 72,

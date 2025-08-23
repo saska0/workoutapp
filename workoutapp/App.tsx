@@ -17,6 +17,7 @@ import EditTemplateScreen from './src/screens/EditTemplateScreen';
 import BrowseTemplatesScreen from './src/screens/BrowseTemplatesScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
 import AgendaScreen from './src/screens/AgendaScreen';
+import MetricsScreen from './src/screens/MetricsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -130,6 +131,15 @@ export default function App() {
             <Stack.Screen 
               name="Agenda" 
               component={AgendaScreen} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_right',
+              }} 
+            />
+            <Stack.Screen 
+              name="Metrics" 
+              component={MetricsScreen} 
               options={{ 
                 headerShown: false,
                 gestureEnabled: true,

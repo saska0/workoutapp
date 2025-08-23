@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import TileBlock from '../components/TileBlock'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -21,7 +21,7 @@ export default function MainMenuScreen({ navigation }: Props) {
   const [logoutConfirmation, setLogoutConfirmation] = useState(false);
   useEffect(() => {
     if (!logoutConfirmation) return;
-    const t = setTimeout(() => setLogoutConfirmation(false), 5000);
+    const t = setTimeout(() => setLogoutConfirmation(false), 2500);
     return () => clearTimeout(t);
   }, [logoutConfirmation]);
 
@@ -52,7 +52,7 @@ export default function MainMenuScreen({ navigation }: Props) {
       </View>
       <View style={styles.row}>
         <TileBlock title="Edit" iconName='edit' onPress={() => navigation.navigate('EditMenu')} />
-        <TileBlock title="Log Metrics" iconName='clipboard' onPress={() => console.log('Metrics')}/>
+        <TileBlock title="Log Metrics" iconName='clipboard' onPress={() => navigation.navigate('Metrics')}/>
       </View>
       <View style={styles.row}>
         <TileBlock title="Settings" iconName='settings' onPress={() => navigation.navigate('EditMenu')} />

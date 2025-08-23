@@ -226,14 +226,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingBottom: 10,
+    paddingBottom: 14,
   },
   backButton: {
     padding: 8,
+    paddingRight: 16,
   },
   headerTitle: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
+    fontSize: typography.fontSize.title_s,
     fontWeight: typography.fontWeight.semibold,
   },
   headerSpacer: {

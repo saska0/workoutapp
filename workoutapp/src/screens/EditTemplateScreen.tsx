@@ -166,11 +166,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingBottom: 10,
+    paddingLeft: 3,
     position: 'relative',
   },
   backButton: {
     position: 'absolute',
     left: 10,
+    top: 0,
     padding: 8,
   },
   backButtonText: {
@@ -180,7 +182,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     color: colors.text.primary,
-    fontSize: typography.fontSize.lg,
+    fontSize: typography.fontSize.title_s,
     fontWeight: typography.fontWeight.semibold,
   },
   headerRight: {

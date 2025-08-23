@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     },
 	title: { 
 		color: colors.text.primary, 
-		fontSize: typography.fontSize.lg, 
+		fontSize: typography.fontSize.title_s, 
 		fontWeight: typography.fontWeight.semibold,
 		flex: 1,
 		textAlign: 'center'
