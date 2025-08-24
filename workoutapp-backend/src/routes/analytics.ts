@@ -124,7 +124,7 @@ router.get('/', authenticateJWT, async (req: AuthRequest, res) => {
       averageSessionLength: formatDuration(avgSessionSeconds),
       current: {
         maxHang: latestHang ? `${latestHang.value}kg` : '—',
-        maxPullup: latestPull ? `${latestPull.value}` : '—',
+        maxPullup: latestPull ? `${latestPull.value}kg` : '—',
         maxWeight: latestWeight ? `${latestWeight.value}kg` : '—',
       },
       chartData,
