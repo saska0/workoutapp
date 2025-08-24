@@ -1,4 +1,5 @@
 import { getAuthToken } from './auth';
+import { invalidateAnalyticsCache } from '../context/AnalyticsContext';
 
 const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -26,5 +27,27 @@ export async function postProgress(metric: ProgressMetric, value: number, date: 
     const err = await res.json().catch(() => ({}));
     throw new Error(err?.error || 'Failed to log progress');
   }
-  return res.json();
+  
+  const result = res.json();
+  
+  // Invalidate analytics cache since new progress affects analytics
+  invalidateAnalyticsCache();
+  
+  return result;
+}
+
+export interface ProgressEntry {
+  _id: string;
+  userId: string;
+  metric: ProgressMetric;
+  value: number;
+  date: string;
+  __v: number;
+}
+
+export interface ProgressHistoryResponse {
+  period?: string;
+  metric: ProgressMetric;
+  totalEntries?: number;
+  entries: ProgressEntry[];
 }

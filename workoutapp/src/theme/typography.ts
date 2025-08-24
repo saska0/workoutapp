@@ -22,6 +22,12 @@ export const typography = {
   fontFamily: {
     monospace: Platform.OS === 'ios' ? 'Menlo' : Platform.OS === 'android' ? 'monospace' : 'Courier New',
   },
+
+  chart: {
+    hangColor: '#FF5733', // Example color for hang
+    pullupColor: '#33C1FF', // Example color for pull-up
+    weightColor: '#33FF57', // Example color for weight
+  },
 } as const;
 
-export type AppTypography = typeof typography; 
+export type AppTypography = typeof typography;

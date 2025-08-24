@@ -31,6 +31,11 @@ export const colors = {
     border: '#444444',
     borderError: '#ff6b6b',
   },
+  chart: {
+    bw: '#9e7880ff',
+    hng: '#727ea5ff',
+    pull: '#83a57fff',
+  },
 } as const;
 
 export type AppColors = typeof colors; 

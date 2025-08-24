@@ -48,7 +48,7 @@ export default function MainMenuScreen({ navigation }: Props) {
         <TileBlock title="Calendar" iconName='calendar' onPress={() => navigation.navigate('Calendar')} />
       </View>
       <View style={styles.row}>
-        <TileBlock title="Analytics" iconName='bar-chart' onPress={() => {}} />
+        <TileBlock title="Analytics" iconName='bar-chart' onPress={() => navigation.navigate('Analytics')} />
       </View>
       <View style={styles.row}>
         <TileBlock title="Edit" iconName='edit' onPress={() => navigation.navigate('EditMenu')} />

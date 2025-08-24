@@ -1,19 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { getAuthToken } from '../api/auth';
+import { getSessions, type Session } from '../api/sessions';
 
-export interface UserSession {
-  _id: string;
-  startedAt: string;
-  endedAt: string;
-  notes?: string;
-  completedWorkouts: Array<{
-    templateId: string;
-    name: string;
-    startedAt: string;
-    endedAt: string;
-    durationSec?: number;
-  }>;
-}
+export type UserSession = Session;
 
 interface SessionsContextType {
   sessions: UserSession[];
@@ -48,26 +36,7 @@ export function SessionsProvider({ children }: SessionsProviderProps) {
     setError(null);
     
     try {
-      const token = await getAuthToken();
-      if (!token) {
-        throw new Error('No auth token available');
-      }
-
-      const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL + '/api/sessions';
-
-      const response = await fetch(API_BASE_URL, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch sessions: ${response.status}`);
-      }
-
-      const data = await response.json();
+      const data = await getSessions();
       setSessions(data || []);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch sessions';

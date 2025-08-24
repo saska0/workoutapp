@@ -1,5 +1,6 @@
 import { SessionTimerProvider } from './src/context/SessionTimerContext';
 import { SessionsProvider } from './src/context/SessionsContext';
+import { AnalyticsProvider } from './src/context/AnalyticsContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet, View } from 'react-native';
@@ -18,12 +19,14 @@ import BrowseTemplatesScreen from './src/screens/BrowseTemplatesScreen';
 import CalendarScreen from './src/screens/CalendarScreen';
 import AgendaScreen from './src/screens/AgendaScreen';
 import MetricsScreen from './src/screens/MetricsScreen';
+import AnalyticScreen from './src/screens/AnalyticScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+    <AnalyticsProvider>
     <SessionsProvider>
     <SessionTimerProvider>
       <View style={styles.container}>
@@ -146,11 +149,21 @@ export default function App() {
                 animation: 'slide_from_right',
               }} 
             />
+            <Stack.Screen 
+              name="Analytics" 
+              component={AnalyticScreen} 
+              options={{ 
+                headerShown: false,
+                gestureEnabled: true,
+                animation: 'slide_from_right',
+              }} 
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </View> 
     </SessionTimerProvider>
     </SessionsProvider>
+    </AnalyticsProvider>
     </GestureHandlerRootView>
   );
 }
