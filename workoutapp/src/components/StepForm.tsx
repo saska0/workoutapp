@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   kindTextSelected: {
     color: colors.text.primary,
-    fontWeight: 'bold',
+    fontWeight: typography.fontWeight.bold,
   },
   removeButton: {
     backgroundColor: colors.button.disabled,
@@ -149,6 +149,6 @@ const styles = StyleSheet.create({
   },
   removeButtonText: {
     color: colors.text.error,
-    fontWeight: 'bold',
+    fontWeight: typography.fontWeight.bold,
   },
 });

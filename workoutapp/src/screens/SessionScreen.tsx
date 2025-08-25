@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border.primary,
     borderRadius: 12,
     padding: 12,
-    shadowColor: '#000',
+    shadowColor: colors.border.primary,
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 1,
     shadowRadius: 0,
@@ -452,6 +452,6 @@ const styles = StyleSheet.create({
   },
   notesActionText: {
     color: colors.text.primary,
-    fontWeight: '600',
+    fontWeight: typography.fontWeight.semibold,
   },
 });

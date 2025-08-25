@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: typography.fontWeight.semibold,
     color: colors.text.primary,
     marginBottom: 12,
   },
