@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Activi
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { WorkoutStep } from '../types/workout';
-import { getAuthToken } from '../api/auth';
 import { colors, typography } from '../theme';
 import { fetchTemplateById, updateTemplate } from '../api/templates';
 import WideButton from '../components/WideButton';
@@ -58,12 +57,10 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
     try {
       setLoading(true);
       setError(null);
-      const token = await getAuthToken();
-      if (!token) throw new Error('No auth token');
-  const tpl = await fetchTemplateById(token, templateId);
+      const tpl = await fetchTemplateById(templateId);
       setName(tpl.name || '');
       setSteps(Array.isArray(tpl.steps) ? tpl.steps : []);
-  setIsPublic(!!tpl.isPublic);
+      setIsPublic(!!tpl.isPublic);
     } catch (e: any) {
       setError(e?.message || 'Failed to load template');
     } finally {
@@ -74,15 +71,13 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
   useEffect(() => {
     loadTemplate();
   }, [loadTemplate]);
-
+  
   const handleSave = async () => {
     try {
       setSaving(true);
       if (!name.trim()) throw new Error('Template name is required');
       if (steps.length === 0) throw new Error('Template must have at least one step');
-      const token = await getAuthToken();
-      if (!token) throw new Error('No auth token');
-  await updateTemplate(token, templateId, { name, steps, isPublic });
+      await updateTemplate(templateId, { name, steps, isPublic });
       navigation.goBack();
     } catch (e: any) {
       Alert.alert('Save failed', e?.message || 'Failed to save template');

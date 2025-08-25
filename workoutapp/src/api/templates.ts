@@ -1,4 +1,8 @@
-export async function fetchUserTemplates(token: string) {
+import { getAuthToken } from './auth';
+
+export async function fetchUserTemplates() {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
   const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/api/templates/user', {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -9,7 +13,9 @@ export async function fetchUserTemplates(token: string) {
   return response.json();
 }
 
-export async function fetchSelectedTemplates(token: string) {
+export async function fetchSelectedTemplates() {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
   const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/api/templates/selected', {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -20,7 +26,9 @@ export async function fetchSelectedTemplates(token: string) {
   return response.json();
 }
 
-export async function updateSelectedTemplates(token: string, selectedTemplateIds: string[]) {
+export async function updateSelectedTemplates(selectedTemplateIds: string[]) {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
   const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/api/templates/selected', {
     method: 'PATCH',
     headers: {
@@ -33,7 +41,9 @@ export async function updateSelectedTemplates(token: string, selectedTemplateIds
   return response.json();
 }
 
-export async function fetchSharedTemplates(token: string) {
+export async function fetchSharedTemplates() {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
   const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + '/api/templates/shared', {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -44,7 +54,9 @@ export async function fetchSharedTemplates(token: string) {
   return response.json();
 }
 
-export async function deleteTemplate(token: string, templateId: string) {
+export async function deleteTemplate(templateId: string) {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
   const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + `/api/templates/${templateId}`, {
     method: 'DELETE',
     headers: {
@@ -56,7 +68,9 @@ export async function deleteTemplate(token: string, templateId: string) {
   return true;
 }
 
-export async function fetchTemplateById(token: string, templateId: string) {
+export async function fetchTemplateById(templateId: string) {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
   const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + `/api/templates/${templateId}`, {
     headers: {
       'Authorization': `Bearer ${token}`,
@@ -67,7 +81,9 @@ export async function fetchTemplateById(token: string, templateId: string) {
   return response.json();
 }
 
-export async function updateTemplate(token: string, templateId: string, payload: { name?: string; steps?: any[]; isPublic?: boolean }) {
+export async function updateTemplate(templateId: string, payload: { name?: string; steps?: any[]; isPublic?: boolean }) {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
   const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + `/api/templates/${templateId}`, {
     method: 'PUT',
     headers: {
@@ -80,7 +96,9 @@ export async function updateTemplate(token: string, templateId: string, payload:
   return response.json();
 }
 
-export async function copyTemplate(token: string, templateId: string) {
+export async function copyTemplate(templateId: string) {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
   const response = await fetch(process.env.EXPO_PUBLIC_BACKEND_URL + `/api/templates/${templateId}/copy`, {
     method: 'POST',
     headers: {

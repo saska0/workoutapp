@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
+
 import express from 'express';
+import cors from 'cors';
 import templatesRouter from './routes/templates';
 import sessionsRouter from './routes/sessions';
 import userProgressRouter from './routes/userProgress';
@@ -11,6 +13,7 @@ import devSeedRouter from './routes/devSeed';
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 connectToDatabase();
 
 

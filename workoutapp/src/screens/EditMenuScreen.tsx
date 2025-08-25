@@ -7,7 +7,6 @@ import { RootStackParamList } from '../types/navigation';
 import MenuRow from '../components/MenuRow';
 import SwipeableRow from '../components/SwipeableRow';
 import { fetchUserTemplates, fetchSelectedTemplates, updateSelectedTemplates, deleteTemplate } from '../api/templates';
-import { getAuthToken } from '../api/auth';
 import TileBlock from '@components/TileBlock';
 import WideButton from '../components/WideButton';
 import { colors, typography } from '../theme';
@@ -28,12 +27,9 @@ export default function EditMenuScreen({ navigation }: Props) {
     setLoading(workouts.length === 0);
     setError(null);
     try {
-      const token = await getAuthToken();
-      if (!token) throw new Error('No auth token');
-      
       const [templatesData, selectedData] = await Promise.all([
-        fetchUserTemplates(token),
-        fetchSelectedTemplates(token)
+        fetchUserTemplates(),
+        fetchSelectedTemplates()
       ]);
       
       // Convert selected templates array to Set of IDs
@@ -75,11 +71,8 @@ export default function EditMenuScreen({ navigation }: Props) {
     // Optimistically update UI
     setSelectedWorkouts(newSelected);
     
-    try {
-      const token = await getAuthToken();
-      if (!token) throw new Error('No auth token');
-      
-      await updateSelectedTemplates(token, Array.from(newSelected));
+    try {     
+      await updateSelectedTemplates(Array.from(newSelected));
     } catch (err) {
       setSelectedWorkouts(selectedWorkouts);
       console.error('Failed to update selection:', err);
@@ -111,9 +104,7 @@ export default function EditMenuScreen({ navigation }: Props) {
     setMenuModalVisible(false);
     if (selectedWorkoutForMenu) {
       try {
-        const token = await getAuthToken();
-        if (!token) throw new Error('No auth token');
-        await deleteTemplate(token, selectedWorkoutForMenu._id);
+        await deleteTemplate(selectedWorkoutForMenu._id);
         // Remove from local state
         setWorkouts(workouts.filter(w => w._id !== selectedWorkoutForMenu._id));
         setSelectedWorkouts(prev => {

@@ -5,7 +5,6 @@ import { Feather } from '@expo/vector-icons';
 import { RootStackParamList } from '../types/navigation';
 import { colors, typography } from '../theme';
 import { fetchSharedTemplates, copyTemplate } from '../api/templates';
-import { getAuthToken } from '../api/auth';
 import MenuRow from '../components/MenuRow';
 
  type Props = NativeStackScreenProps<RootStackParamList, 'BrowseTemplates'>;
@@ -23,9 +22,7 @@ export default function BrowseTemplatesScreen({ navigation }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const token = await getAuthToken();
-      if (!token) throw new Error('No auth token');
-      const list = await fetchSharedTemplates(token);
+      const list = await fetchSharedTemplates();
       setWorkouts(list);
     } catch (e: any) {
     setError(e?.message || 'Failed to fetch');
@@ -38,12 +35,26 @@ export default function BrowseTemplatesScreen({ navigation }: Props) {
 
   const filteredWorkouts = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return workouts;
-    return workouts.filter((w) => {
-      const name = String(w.name || '').toLowerCase();
+
+    // Get the base list: either all workouts or those matching the query
+    const baseList = !q
+      ? workouts.slice()
+      : workouts.filter((w) => {
+          const name = String(w.name || '').toLowerCase();
+          const owner = String(w.ownerUsername || w.owner || w.username || '').toLowerCase();
+          return name.includes(q) || owner.includes(q);
+        });
+
+    // Partition to keep original relative order and put 'workoutapp' items first
+    const appOwned: any[] = [];
+    const others: any[] = [];
+    for (const w of baseList) {
       const owner = String(w.ownerUsername || w.owner || w.username || '').toLowerCase();
-      return name.includes(q) || owner.includes(q);
-    });
+      if (owner === 'workoutapp') appOwned.push(w);
+      else others.push(w);
+    }
+
+    return [...appOwned, ...others];
   }, [workouts, query]);
 
   const handleMenuPress = (workout: any) => {
@@ -59,11 +70,9 @@ export default function BrowseTemplatesScreen({ navigation }: Props) {
   const handleCopy = async () => {
     if (!selectedWorkoutForMenu) return;
     try {
-      const token = await getAuthToken();
-      if (!token) throw new Error('No auth token');
-  await copyTemplate(token, selectedWorkoutForMenu._id);
-  closeModal();
-  navigation.goBack();
+      await copyTemplate(selectedWorkoutForMenu._id);
+      closeModal();
+      navigation.goBack();
     } catch (e) {
       closeModal();
     }

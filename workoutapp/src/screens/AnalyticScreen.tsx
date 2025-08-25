@@ -7,18 +7,22 @@ import {
   View,
   ActivityIndicator,
   useWindowDimensions,
+  TouchableOpacity,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 import { colors, typography } from '../theme';
 import WideButton from '../components/WideButton';
 import { useAnalytics } from '../context/AnalyticsContext';
 import { AnalyticsPeriod } from '../api/analytics';
 import { LineChart } from 'react-native-gifted-charts';
+import Feather from '@expo/vector-icons/build/Feather';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Analytics'>;
 
 export default function AnalyticScreen({}: Props) {
+  const navigation = useNavigation();
   const { width: screenWidth } = useWindowDimensions();
   const [period, setPeriod] = useState<AnalyticsPeriod>('7d');
   const { getCachedData, ensureDataLoaded } = useAnalytics();
@@ -88,16 +92,35 @@ export default function AnalyticScreen({}: Props) {
     chartData.pullupData.length,
     chartData.weightData.length
   );
+  // Compute spacing per-segment so plotted points fill the available plot area nicely
   const spacing = useMemo(() => {
-  if (pointCount <= 1) return 0;
-  const segments = pointCount - 1;
+    if (pointCount <= 1) return 0;
+    const segments = Math.max(1, pointCount - 1);
     // Subtract y-axis label width so we fit within the actual plot area
     const plotWidth = Math.max(80, chartWidth - Y_AXIS_LABEL_W);
-    const usable = Math.max(60, plotWidth - (INITIAL_SPACING + END_SPACING));
-    const s = Math.floor(usable / segments);
-    // Clamp spacing to keep 7d readable and 30d compressed
-    return Math.max(6, Math.min(s, 40));
-  }, [chartWidth, pointCount]);
+
+    // Raw spacing if we divide the usable plot width evenly across segments
+    const usable = Math.max(24, plotWidth - (INITIAL_SPACING + END_SPACING));
+    const raw = Math.floor(usable / segments);
+
+    const minSpacing = 4;
+    const maxSpacing = Math.max(24, Math.floor(plotWidth / Math.min(3, segments)));
+
+    const s = Math.max(minSpacing, Math.min(raw, maxSpacing));
+    return s;
+  }, [chartWidth, pointCount, INITIAL_SPACING, END_SPACING]);
+
+  // Compute an initial spacing (left offset) that centers the plotted points within the plot area
+  const dynamicInitialSpacing = useMemo(() => {
+    if (pointCount <= 1) return INITIAL_SPACING;
+    const segments = Math.max(1, pointCount - 1);
+    const plotWidth = Math.max(80, chartWidth - Y_AXIS_LABEL_W);
+    const usedBySegments = segments * spacing;
+    // Remaining horizontal space after placing segments and end spacing
+    const leftover = Math.max(0, plotWidth - (usedBySegments + END_SPACING));
+    // Place half of leftover as initial spacing to roughly center points
+    return Math.max(4, Math.floor(leftover / 2));
+  }, [chartWidth, pointCount, spacing, END_SPACING, INITIAL_SPACING]);
 
   // Add headroom so the plotted lines sit a bit lower inside the chart area
   const maxChartValue = useMemo(() => {
@@ -121,9 +144,15 @@ export default function AnalyticScreen({}: Props) {
 
   return (
     <SafeAreaView style={styles.safe}>
+			<View style={styles.header}> 
+				<TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+				  <Feather name="x" size={20} color={colors.text.primary} />
+				</TouchableOpacity>
+				<Text style={styles.title}>Analytics</Text>
+				<View style={styles.spacer} />
+			</View>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Overview</Text>
           <View style={styles.segmentRow}>
             <View style={styles.segmentCol}>
               <WideButton
@@ -189,7 +218,7 @@ export default function AnalyticScreen({}: Props) {
                 height={230}
                 width={chartWidth}
                 spacing={spacing}
-                initialSpacing={INITIAL_SPACING}
+                initialSpacing={dynamicInitialSpacing}
                 endSpacing={END_SPACING}
                 maxValue={maxChartValue}
                 color1={colors.chart.hng}
@@ -333,6 +362,28 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 16,
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingBottom: 7,
+    paddingTop: 3,
+    backgroundColor: colors.background.primary,
+	borderBottomWidth: 5,
+	borderColor: colors.border.primary,
+  },
+  backButton: {
+    padding: 8,
+  },
+	title: { 
+		color: colors.text.primary, 
+		fontSize: typography.fontSize.title_s, 
+		fontWeight: typography.fontWeight.semibold,
+		flex: 1,
+		textAlign: 'center'
+	},
+	spacer: { width: 31 },
 
   // Card
   card: {

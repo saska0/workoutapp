@@ -7,7 +7,6 @@ import { useSessionTimer } from '../context/SessionTimerContext';
 import { useUserSessions } from '../context/SessionsContext';
 import { colors, typography } from '../theme';
 import { fetchSelectedTemplates } from '../api/templates';
-import { getAuthToken } from '../api/auth';
 import { postSession, type SessionData } from '../api/sessions';
 import { useFocusEffect } from '@react-navigation/native';
 import type { WorkoutTemplate } from '../types/workout';
@@ -60,18 +59,13 @@ export default function SessionScreen({ navigation }: Props) {
   const handleLogSession = useCallback(async () => {
     setIsLoggingSession(true);
     try {
-      const token = await getAuthToken();
-      if (!token) throw new Error('No auth token');
-
       const sessionData: SessionData = {
         startedAt: sessionStartTime || new Date(),
         endedAt: new Date(),
         completedWorkouts,
         notes: sessionNotes.trim() || undefined,
       };
-
-      const result = await postSession(token, sessionData);
-      
+      const result = await postSession(sessionData);
       if (result) {
         addSession(result);
       }
@@ -154,9 +148,7 @@ export default function SessionScreen({ navigation }: Props) {
     setLoading(selectedWorkouts.length === 0);
     setError(null);
     try {
-      const token = await getAuthToken();
-      if (!token) throw new Error('No auth token');
-      const data = await fetchSelectedTemplates(token);
+      const data = await fetchSelectedTemplates();
       setSelectedWorkouts(data || []);
     } catch (e: any) {
       setError(e?.message || 'Failed to load selected workouts');

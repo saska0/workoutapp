@@ -75,7 +75,11 @@ export default function WideButton({
           onPressOut={handlePressOut}
           style={buttonStyle}
         >
-          <Text style={[styles.title, { color: textColor }]}>{title}</Text>
+          <Text
+            style={[styles.title, { color: textColor }]}
+          >
+            {title}
+          </Text>
         </Pressable>
       </Animated.View>
     </View>
@@ -102,7 +106,7 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: 2,
     borderRadius: 8,
     borderWidth: 3,
     borderColor: colors.border.primary,

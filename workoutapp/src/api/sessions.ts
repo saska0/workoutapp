@@ -62,7 +62,10 @@ export async function getSessions(options?: GetSessionsOptions): Promise<Session
   return response.json();
 }
 
-export async function postSession(token: string, sessionData: SessionData) {
+export async function postSession(sessionData: SessionData) {
+  const token = await getAuthToken();
+  if (!token) throw new Error('No auth token');
+
   const response = await fetch(API_BASE_URL, {
     method: 'POST',
     headers: {
