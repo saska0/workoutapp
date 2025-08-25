@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Modal, Pressable, Animated, PanResponder, Dimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, ActivityIndicator, Modal, Pressable, Animated, PanResponder, Dimensions, TextInput } from 'react-native';
 import { RootStackParamList } from '../types/navigation';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import TileBlock from '../components/TileBlock';
+import WideButton from '../components/WideButton';
 import { useSessionTimer } from '../context/SessionTimerContext';
 import { useUserSessions } from '../context/SessionsContext';
 import { colors, typography } from '../theme';
@@ -41,19 +42,27 @@ export default function SessionScreen({ navigation }: Props) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [endModalVisible, setEndModalVisible] = useState(false);
+  const [notesModalVisible, setNotesModalVisible] = useState(false);
   const [isLoggingSession, setIsLoggingSession] = useState(false);
 
   // Bottom sheet animation and gesture
   const sheetTranslateY = useRef(new Animated.Value(0)).current;
   const screenHeight = Dimensions.get('window').height;
   const sheetHeight = Math.round(screenHeight * 0.45);
+  // Notes modal animation (slides from top down to sit above the bottom sheet)
+  const notesHeight = Math.round(screenHeight * 0.32);
+  const notesTranslateY = useRef(new Animated.Value(-notesHeight)).current;
+  const notesTargetTop = screenHeight - sheetHeight - notesHeight - 12; // 12px gap
 
   const closeEndSheet = useCallback(() => {
+    closeNotesModal();
     Animated.timing(sheetTranslateY, {
       toValue: sheetHeight,
       duration: 200,
       useNativeDriver: true,
-    }).start(() => setEndModalVisible(false));
+    }).start(() => {
+      setEndModalVisible(false);
+    });
   }, [sheetHeight, sheetTranslateY]);
 
   const handleLogSession = useCallback(async () => {
@@ -157,6 +166,25 @@ export default function SessionScreen({ navigation }: Props) {
     }
   }, [selectedWorkouts.length]);
 
+  const openNotesModal = useCallback(() => {
+    setNotesModalVisible(true);
+    // start above screen then slide down
+    notesTranslateY.setValue(-notesHeight);
+    Animated.timing(notesTranslateY, {
+      toValue: notesTargetTop,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  }, [notesHeight, notesTargetTop, notesTranslateY]);
+
+  const closeNotesModal = useCallback(() => {
+    Animated.timing(notesTranslateY, {
+      toValue: -notesHeight,
+      duration: 180,
+      useNativeDriver: true,
+    }).start(() => setNotesModalVisible(false));
+  }, [notesHeight, notesTranslateY]);
+
   useFocusEffect(
     useCallback(() => {
       loadSelected();
@@ -242,9 +270,12 @@ export default function SessionScreen({ navigation }: Props) {
                 title="Add Notes"
                 iconName='edit-2'
                 onPress={() => {
-                  // TODO: Add notes functionality
-                  console.log('Add notes pressed');
-                }} 
+                  if (notesModalVisible) {
+                    closeNotesModal();
+                  } else {
+                    openNotesModal();
+                  }
+                }}
               />
             </View>
             <View style={styles.modalButtonsRow}>
@@ -266,6 +297,41 @@ export default function SessionScreen({ navigation }: Props) {
                 {completedWorkouts.length} workout{completedWorkouts.length !== 1 ? 's' : ''} completed
               </Text>
             )}
+          </Animated.View>
+          {/* Notes panel */}
+          <Animated.View
+            pointerEvents={notesModalVisible ? 'auto' : 'none'}
+            style={[
+              styles.notesPanel,
+              { top: 0, height: notesHeight, zIndex: 10, transform: [{ translateY: notesTranslateY }] },
+            ]}
+          >
+            <View style={styles.notesHeaderRow}>
+            </View>
+            <TextInput
+              value={sessionNotes}
+              onChangeText={setSessionNotes}
+              placeholder="Type notes about this session..."
+              placeholderTextColor={colors.text.secondary}
+              multiline
+              style={styles.notesInput}
+            />
+            <View style={styles.notesActionsRow}>
+              <WideButton
+                title="Clear"
+                onPress={() => { setSessionNotes(''); }}
+                backgroundColor={colors.button.deactivated}
+                style={{ flex: 1, marginRight: 8 }}
+                textColor={colors.text.primary}
+              />
+              <WideButton
+                title="Done"
+                onPress={closeNotesModal}
+                backgroundColor={colors.button.activated}
+                style={{ flex: 1 }}
+                textColor={colors.text.primary}
+              />
+            </View>
           </Animated.View>
         </View>
       </Modal>
@@ -336,5 +402,56 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     textAlign: 'center',
     marginTop: 16,
+  },
+  notesPanel: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    height: '32%',
+    backgroundColor: colors.background.secondary,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
+    borderRadius: 12,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 0,
+  },
+  notesHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  notesInput: {
+    flex: 1,
+    color: colors.text.primary,
+    textAlignVertical: 'top',
+    padding: 8,
+    borderWidth: 2,
+    borderColor: colors.border.primary,
+    borderRadius: 8,
+    backgroundColor: colors.background.primary,
+    marginBottom: 8,
+  },
+  notesActionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  notesActionBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+  },
+  notesActionClear: {
+    backgroundColor: colors.button.deactivated,
+  },
+  notesActionSave: {
+    backgroundColor: colors.button.activated,
+  },
+  notesActionText: {
+    color: colors.text.primary,
+    fontWeight: '600',
   },
 });

@@ -98,7 +98,7 @@ export default function CalendarScreen() {
 					textDisabledColor: colors.text.placeholder,
 					arrowColor: colors.text.primary,
 					monthTextColor: colors.text.primary,
-					textMonthFontWeight: typography.fontWeight.semibold as any,
+					textMonthFontWeight: typography.fontWeight.semibold,
 					textDayFontSize: typography.fontSize.md,
 					textMonthFontSize: typography.fontSize.lg,
 					textDayHeaderFontSize: typography.fontSize.sm,
