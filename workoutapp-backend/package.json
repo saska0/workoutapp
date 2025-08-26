@@ -20,7 +20,7 @@
   },
   "scripts": {
     "ts-node": "ts-node",
-    "start": "cross-env NODE_ENV=production ts-node index.ts",
+    "start": "NODE_ENV=production ts-node index.ts",
     "dev": "cross-env NODE_ENV=development ts-node index.ts",
     "test": "cross-env NODE_ENV=test jest"
   },
