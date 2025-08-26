@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert, Switch } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert, Switch, Modal } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { WorkoutStep } from '../types/workout';
@@ -7,6 +7,7 @@ import { colors, typography } from '../theme';
 import { fetchTemplateById, updateTemplate } from '../api/templates';
 import WideButton from '../components/WideButton';
 import StepForm from '../components/StepForm';
+import NeoInput from '../components/NeoInput';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditTemplate'>;
 
@@ -18,6 +19,8 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPublic, setIsPublic] = useState(false);
+  const [originalTemplate, setOriginalTemplate] = useState<{ name: string; steps: WorkoutStep[]; isPublic: boolean } | null>(null);
+  const [showConfirmLeave, setShowConfirmLeave] = useState(false);
 
   const addStep = () => {
     setSteps((prev) => [
@@ -61,6 +64,7 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
       setName(tpl.name || '');
       setSteps(Array.isArray(tpl.steps) ? tpl.steps : []);
       setIsPublic(!!tpl.isPublic);
+  setOriginalTemplate({ name: tpl.name || '', steps: Array.isArray(tpl.steps) ? tpl.steps : [], isPublic: !!tpl.isPublic });
     } catch (e: any) {
       setError(e?.message || 'Failed to load template');
     } finally {
@@ -86,10 +90,37 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
     }
   };
 
+  const isDirty = () => {
+    if (!originalTemplate) return false;
+    if (name.trim() !== (originalTemplate.name || '').trim()) return true;
+    if (isPublic !== originalTemplate.isPublic) return true;
+    // deep compare for steps
+    try {
+      return JSON.stringify(steps) !== JSON.stringify(originalTemplate.steps);
+    } catch (e) {
+      return true;
+    }
+  };
+
+  const handleBackPress = () => {
+    if (!isDirty()) {
+      navigation.goBack();
+      return;
+    }
+    setShowConfirmLeave(true);
+  };
+
+  const confirmDiscard = () => {
+    setShowConfirmLeave(false);
+    navigation.goBack();
+  };
+
+  const cancelDiscard = () => setShowConfirmLeave(false);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Text style={styles.backButtonText}>✕</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit</Text>
@@ -107,11 +138,11 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
         <ActivityIndicator size="large" color={colors.text.primary} />
       ) : (
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <TextInput
-            style={styles.input}
+          <NeoInput
             placeholder="Template Name"
             value={name}
             onChangeText={setName}
+            containerStyle={styles.inputSpacing}
           />
           
           <StepForm
@@ -145,6 +176,34 @@ export default function EditTemplateScreen({ navigation, route }: Props) {
           />
         </ScrollView>
       )}
+
+      <Modal
+        visible={showConfirmLeave}
+        transparent
+        animationType="fade"
+        onRequestClose={cancelDiscard}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Discard changes?</Text>
+            <Text style={styles.modalMessage}>You have unsaved changes. Are you sure you want to discard them and leave?</Text>
+            <View style={styles.modalButtons}>
+              <WideButton
+                title="Discard"
+                onPress={confirmDiscard}
+                backgroundColor={colors.button.deactivated}
+                style={StyleSheet.flatten([styles.wideButtonSpacing, styles.wideButtonModal])}
+              />
+              <WideButton
+                title="Cancel"
+                onPress={cancelDiscard}
+                backgroundColor={colors.button.tileDefault}
+                style={StyleSheet.flatten([styles.wideButtonSpacing, styles.wideButtonModal])}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -195,6 +254,9 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     flexGrow: 1,
+  },
+  inputSpacing: {
+    marginBottom: 8,
   },
   input: {
     backgroundColor: colors.input.background,
@@ -251,7 +313,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.fontWeight.bold,
   },
   wideButtonSpacing: {
-    marginBottom: 10,
+    marginBottom: 8,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -280,5 +342,40 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.semibold,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: colors.background.secondary,
+    borderWidth: 3,
+    borderColor: colors.border.primary,
+    borderRadius: 12,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.text.primary,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.md,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  wideButtonModal: {
+    width: '48%',
   },
 });

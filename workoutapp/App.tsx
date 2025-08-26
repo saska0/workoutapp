@@ -100,7 +100,7 @@ export default function App() {
               component={CreateTemplateScreen} 
               options={{ 
                 headerShown: false,
-                gestureEnabled: true,
+                gestureEnabled: false,
                 animation: 'slide_from_right',
               }} 
             />
@@ -118,7 +118,7 @@ export default function App() {
               component={EditTemplateScreen} 
               options={{ 
                 headerShown: false,
-                gestureEnabled: true,
+                gestureEnabled: false,
                 animation: 'slide_from_right',
               }} 
             />

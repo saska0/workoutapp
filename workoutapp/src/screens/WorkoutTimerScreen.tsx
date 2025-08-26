@@ -134,10 +134,11 @@ const workoutTimerReducer = (
           if (state.currentRep < (currentStep?.reps || 1)) {
             return {
               ...state,
-              isInRest: false,
-              isInPrepare: true,
-              timeRemaining: PREPARATION_TIME_SEC,
-              totalElapsedTime: state.totalElapsedTime + 1,
+                currentRep: state.currentRep + 1,
+                isInRest: false,
+                isInPrepare: true,
+                timeRemaining: PREPARATION_TIME_SEC,
+                totalElapsedTime: state.totalElapsedTime + 1,
             };
           }
           if (isLastStep) {
@@ -187,6 +188,7 @@ const workoutTimerReducer = (
           // No or short rest: straight to preparation
           return {
             ...state,
+            currentRep: state.currentRep + 1,
             isInPrepare: true,
             timeRemaining: PREPARATION_TIME_SEC,
             totalElapsedTime: state.totalElapsedTime + 1,
@@ -281,6 +283,7 @@ const workoutTimerReducer = (
           // No rest configured: go straight to preparation
           return {
             ...state,
+            currentRep: state.currentRep + 1,
             isInPrepare: true,
             isInRest: false,
             timeRemaining: PREPARATION_TIME_SEC,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { WorkoutStep } from '../types/workout';
@@ -7,6 +7,7 @@ import { getAuthToken } from '../api/auth';
 import { colors, typography } from '../theme';
 import WideButton from '../components/WideButton';
 import StepForm from '../components/StepForm';
+import NeoInput from '../components/NeoInput';
 
 type Props = NativeStackScreenProps<RootStackParamList, any>;
 
@@ -15,6 +16,7 @@ export default function CreateTemplateScreen({ navigation }: Props) {
   const [steps, setSteps] = useState<WorkoutStep[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showConfirmLeave, setShowConfirmLeave] = useState(false);
 
   const addStep = () => {
     setSteps([
@@ -82,20 +84,36 @@ export default function CreateTemplateScreen({ navigation }: Props) {
     }
   };
 
+  const handleBackPress = () => {
+    // If no edits, go back 
+    if (!name.trim() && steps.length === 0) {
+      navigation.goBack();
+      return;
+    }
+    setShowConfirmLeave(true);
+  };
+
+  const confirmDiscard = () => {
+    setShowConfirmLeave(false);
+    navigation.goBack();
+  };
+
+  const cancelDiscard = () => setShowConfirmLeave(false);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
           <Text style={styles.backButtonText}>✕</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Create Template</Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <TextInput
-          style={styles.input}
+        <NeoInput
           placeholder="Template Name"
           value={name}
           onChangeText={setName}
+          containerStyle={styles.inputSpacing}
         />
         
         <StepForm
@@ -128,6 +146,34 @@ export default function CreateTemplateScreen({ navigation }: Props) {
           ])}
         />
       </ScrollView>
+
+      <Modal
+        visible={showConfirmLeave}
+        transparent
+        animationType="fade"
+        onRequestClose={cancelDiscard}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Discard changes?</Text>
+            <Text style={styles.modalMessage}>You have unsaved changes. Are you sure you want to discard them and leave?</Text>
+            <View style={styles.modalButtons}>
+              <WideButton
+                title="Discard"
+                onPress={confirmDiscard}
+                backgroundColor={colors.button.deactivated}
+                style={styles.wideButtonModal}
+              />
+              <WideButton
+                title="Cancel"
+                onPress={cancelDiscard}
+                backgroundColor={colors.button.tileDefault}
+                style={styles.wideButtonModal}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -166,6 +212,9 @@ const styles = StyleSheet.create({
     padding: 20,
     flexGrow: 1,
   },
+  inputSpacing: {
+    marginBottom: 8,
+  },
   title: {
     fontSize: typography.fontSize.title,
     fontWeight: typography.fontWeight.bold,
@@ -192,7 +241,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   wideButtonSpacing: {
-    marginVertical: 8,
+    marginVertical: 4,
   },
   buttonDisabled: {
     backgroundColor: colors.button.disabled,
@@ -211,5 +260,40 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.md,
     fontWeight: typography.fontWeight.semibold,
     textAlign: 'center',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: colors.background.secondary,
+    borderWidth: 3,
+    borderColor: colors.border.primary,
+    borderRadius: 12,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: typography.fontSize.lg,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.text.primary,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalMessage: {
+    color: colors.text.secondary,
+    fontSize: typography.fontSize.md,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  wideButtonModal: {
+    width: '48%',
   },
 });
