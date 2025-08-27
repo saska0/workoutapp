@@ -1,4 +1,6 @@
 import { getAuthToken } from './auth';
+import { BACKEND_URL } from '../config/runtime';
+const baseUrl = BACKEND_URL;
 
 export type AnalyticsPeriod = '7d' | '30d' | 'all';
 
@@ -20,7 +22,6 @@ export type AnalyticsResponse = {
 export async function fetchAnalytics(period: AnalyticsPeriod): Promise<AnalyticsResponse> {
 	const token = await getAuthToken();
 	if (!token) throw new Error('No auth token');
-	const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
 
 	const res = await fetch(`${baseUrl}/api/analytics?period=${encodeURIComponent(period)}` as string, {
 		headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },

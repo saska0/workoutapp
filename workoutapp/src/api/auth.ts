@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL + '/api/auth';
+import { BACKEND_URL } from '../config/runtime';
+const API_BASE_URL = `${BACKEND_URL}/api/auth`;
 
 export interface RegisterRequest {
   username: string;

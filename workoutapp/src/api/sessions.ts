@@ -1,7 +1,7 @@
 import { getAuthToken } from './auth';
 import { invalidateAnalyticsCache } from '../context/AnalyticsContext';
-
-const API_BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL + '/api/sessions';
+import { BACKEND_URL } from '../config/runtime';
+const API_BASE_URL = `${BACKEND_URL}/api/sessions`;
 
 export interface CompletedWorkout {
   templateId: string;

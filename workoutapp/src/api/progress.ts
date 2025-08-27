@@ -1,7 +1,7 @@
 import { getAuthToken } from './auth';
 import { invalidateAnalyticsCache } from '../context/AnalyticsContext';
-
-const BASE_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
+import { BACKEND_URL } from '../config/runtime';
+const BASE_URL = BACKEND_URL;
 
 export type ProgressMetric = 'weight' | 'pullup_1rm' | 'hang_20mm_7s';
 
