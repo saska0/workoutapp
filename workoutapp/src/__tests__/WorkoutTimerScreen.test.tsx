@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import WorkoutTimerScreen from '../screens/WorkoutTimerScreen';
+import { SessionTimerProvider } from '../context/SessionTimerContext';
 
 const mockNavigation = {
   navigate: jest.fn(),
@@ -10,6 +11,7 @@ const mockNavigation = {
 const mockRoute = {
   params: {
     workoutTemplate: {
+      _id: 'mock-id-1',
       name: 'Test Workout',
       steps: [
         {
@@ -37,6 +39,12 @@ jest.spyOn(require('react-native'), 'Alert').mockImplementation(() => ({
   alert: jest.fn(),
 }));
 
+const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <SessionTimerProvider>
+    {children}
+  </SessionTimerProvider>
+);
+
 describe('WorkoutTimerScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,7 +57,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('renders correctly with workout template', () => {
     const { getByText } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     expect(getByText(/Test Workout/)).toBeTruthy();
@@ -58,7 +68,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('starts in preparation mode', () => {
     const { getByText } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     expect(getByText(/Get Ready/)).toBeTruthy();
@@ -67,7 +79,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('starts countdown timer when start is pressed', async () => {
     const { getByTestId } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
   
     fireEvent.press(getByTestId('start-button'));
@@ -82,7 +96,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('pauses and resumes timer correctly', async () => {
     const { getByText, getByTestId } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     fireEvent.press(getByTestId('start-button'));
@@ -102,7 +118,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('skips to next phase when skip button is pressed', async () => {
     const { getByTestId } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     expect(getByTestId('rep')).toHaveTextContent('1/2');
@@ -126,7 +144,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('pressing previous during prep of 1st rep of 1st step goes back to beginning of prep (5s)', async () => {
     const { getByText, getByTestId } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     // Start timer and go back to preparation
@@ -141,7 +161,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('pressing previous during an exercise goes back to prep', async () => {
     const { getByText, getByTestId } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     // Skip prep and go back
@@ -155,7 +177,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('pressing previous goes back to previous rep', async () => {
     const { getByTestId } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     // Skip to the next rep and go back
@@ -173,7 +197,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('pressing previous goes back to previous step', async () => {
     const { getByTestId } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     // Skip to the next step and go back
@@ -193,7 +219,9 @@ describe('WorkoutTimerScreen', () => {
 
   it('decrements timeRemaining on each tick', async() => {
     const { getByTestId } = render(
-      <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={mockRoute} navigation={mockNavigation} />
+      </TestWrapper>
     );
   
     fireEvent.press(getByTestId('start-button'));
@@ -209,6 +237,7 @@ describe('WorkoutTimerScreen', () => {
     const routeFirstRest = {
       params: {
         workoutTemplate: {
+          _id: 'mock-id-2',
           name: 'Rest First',
           steps: [
             { name: 'Rest', kind: 'rest' as const, durationSec: 10 },
@@ -219,7 +248,9 @@ describe('WorkoutTimerScreen', () => {
     };
 
     const { getByText, getByTestId } = render(
-      <WorkoutTimerScreen route={routeFirstRest as any} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={routeFirstRest as any} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     fireEvent.press(getByTestId('start-button'));
@@ -234,6 +265,7 @@ describe('WorkoutTimerScreen', () => {
     const routeNextRest = {
       params: {
         workoutTemplate: {
+          _id: 'mock-id-3',
           name: 'Next Is Rest',
           steps: [
             { name: 'exercise1', kind: 'exercise' as const, durationSec: 10, reps: 1, restDurationSec: 0 },
@@ -244,7 +276,9 @@ describe('WorkoutTimerScreen', () => {
     };
 
     const { getByTestId, getByText } = render(
-      <WorkoutTimerScreen route={routeNextRest as any} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={routeNextRest as any} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     // prep -> exercise -> next step (rest)
@@ -257,10 +291,11 @@ describe('WorkoutTimerScreen', () => {
     });
   });
 
-  it('pressing previous on a rest step goes to preparation of previous step', async () => {
+  it('goes back from rest step to preparation of previous step', async () => {
     const routeWithMiddleRest = {
       params: {
         workoutTemplate: {
+          _id: 'mock-id-4',
           name: 'Prev From Rest',
           steps: [
             { name: 'exercise1', kind: 'exercise' as const, durationSec: 10, reps: 1, restDurationSec: 0 },
@@ -272,7 +307,9 @@ describe('WorkoutTimerScreen', () => {
     };
 
     const { getByTestId, getByText } = render(
-      <WorkoutTimerScreen route={routeWithMiddleRest as any} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={routeWithMiddleRest as any} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     // Move to rest step
@@ -292,10 +329,11 @@ describe('WorkoutTimerScreen', () => {
     });
   });
 
-  it('intra-exercise rest flips to preparation when reaching preparation threshold', async () => {
+  it('transitions from intra-step rest back to preparation for next rep', async () => {
     const routeWithIntraRest = {
       params: {
         workoutTemplate: {
+          _id: 'mock-id-5',
           name: 'Intra Rest',
           steps: [
             { name: 'exercise1', kind: 'exercise' as const, durationSec: 5, reps: 2, restDurationSec: 8 },
@@ -305,7 +343,9 @@ describe('WorkoutTimerScreen', () => {
     };
 
     const { getByTestId, getByText } = render(
-      <WorkoutTimerScreen route={routeWithIntraRest as any} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={routeWithIntraRest as any} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     fireEvent.press(getByTestId('start-button'));
@@ -325,10 +365,11 @@ describe('WorkoutTimerScreen', () => {
     });
   });
 
-  it('no rest between reps defaults to preparation', async () => {
+  it('transitions to preparation when no rest is configured between reps', async () => {
     const routeNoRestBetweenReps = {
       params: {
         workoutTemplate: {
+          _id: 'mock-id-6',
           name: 'No Rest Between Reps',
           steps: [
             { name: 'exercise1', kind: 'exercise' as const, durationSec: 5, reps: 2, restDurationSec: 0 },
@@ -338,7 +379,9 @@ describe('WorkoutTimerScreen', () => {
     };
 
     const { getByTestId, getByText } = render(
-      <WorkoutTimerScreen route={routeNoRestBetweenReps as any} navigation={mockNavigation} />
+      <TestWrapper>
+        <WorkoutTimerScreen route={routeNoRestBetweenReps as any} navigation={mockNavigation} />
+      </TestWrapper>
     );
 
     // prep -> exercise1
@@ -351,4 +394,4 @@ describe('WorkoutTimerScreen', () => {
       expect(getByTestId('timer-text')).toHaveTextContent('00:05');
     });
   });
-}); 
+});
