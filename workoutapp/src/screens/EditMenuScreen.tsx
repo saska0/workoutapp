@@ -179,6 +179,17 @@ export default function EditMenuScreen({ navigation }: Props) {
             </Text>
             
             <WideButton 
+              title={selectedWorkoutForMenu && selectedWorkouts.has(selectedWorkoutForMenu._id) ? 'Deselect' : 'Select'}
+              onPress={() => {
+                if (selectedWorkoutForMenu) {
+                  handleActivate(selectedWorkoutForMenu);
+                }
+              }}
+              backgroundColor={colors.button.activated}
+              style={styles.wideButton}
+            />
+
+            <WideButton 
               title="Edit" 
               onPress={handleEditWorkout}
               backgroundColor={colors.button.dark}
