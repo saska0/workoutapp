@@ -6,7 +6,6 @@ import Animated, {
   withSpring,
   runOnJS,
   interpolate,
-  interpolateColor,
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { colors, typography } from '../theme';
@@ -61,23 +60,9 @@ export default function SwipeableRow({ onActivate, children, isSelected = false 
   }));
 
   const indicatorStyle = useAnimatedStyle(() => {
-    const progress = Math.abs(translateX.value) / MAX_SWIPE_DISTANCE;
-    
-    const colorRange = isSelected 
-      ? [colors.button.activated, colors.button.disabled, colors.button.deactivated] 
-      : [colors.background.primary, colors.button.disabled, colors.button.activated];
-    
-    const backgroundColor = interpolateColor(
-      progress,
-      [0, 0.5, 1],
-      colorRange
-    );
-    
-    const opacity = interpolate(progress, [0, 1], [0.3, 1]);
-    
     return {
-      backgroundColor,
-      opacity,
+      backgroundColor: isSelected ? colors.button.activated : colors.button.deactivated,
+      opacity: 1,
     };
   });
 
