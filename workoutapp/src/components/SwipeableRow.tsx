@@ -61,7 +61,7 @@ export default function SwipeableRow({ onActivate, children, isSelected = false 
 
   const indicatorStyle = useAnimatedStyle(() => {
     return {
-      backgroundColor: isSelected ? colors.button.activated : colors.button.deactivated,
+      backgroundColor: isSelected ? colors.button.deactivated : colors.button.activated,
       opacity: 1,
     };
   });
