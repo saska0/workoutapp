@@ -185,7 +185,7 @@ export default function EditMenuScreen({ navigation }: Props) {
                   handleActivate(selectedWorkoutForMenu);
                 }
               }}
-              backgroundColor={colors.button.activated}
+              backgroundColor={selectedWorkoutForMenu && selectedWorkouts.has(selectedWorkoutForMenu._id) ? colors.button.deactivated : colors.button.activated}
               style={styles.wideButton}
             />
 
