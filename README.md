@@ -10,7 +10,7 @@ Create templates, run sessions with timers, log metrics, and review progress.
 
 Test the app with [Expo Go](https://expo.dev/go) (iOS/Android) by scanning the QR code.
 
-![Expo EAS QR](./assets/eas-update.svg)
+![Expo EAS QR](https://qr.expo.dev/eas-update?projectId=733079ec-7f28-46ad-b872-b28b48d5831b&runtimeVersion=1.0.0&channel=main)
 ## Features
 - JWT auth
 - RESTful APIs
