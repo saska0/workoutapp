@@ -155,7 +155,7 @@ export default function App() {
               options={{ 
                 headerShown: false,
                 gestureEnabled: true,
-                animation: 'slide_from_right',
+                animation: 'slide_from_bottom',
               }} 
             />
           </Stack.Navigator>
