@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -143,7 +142,7 @@ export default function AnalyticScreen({}: Props) {
   }, [period, chartData, maxChartValue]);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.container}>
 			<View style={styles.header}> 
 				<TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
 				  <Feather name="x" size={20} color={colors.text.primary} />
@@ -340,7 +339,7 @@ export default function AnalyticScreen({}: Props) {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -354,9 +353,10 @@ function LegendPill({ color, label }: { color: string; label: string }) {
 };
 
 const styles = StyleSheet.create({
-  safe: {
+  container: {
     flex: 1,
     backgroundColor: colors.background.primary,
+    paddingTop: 70,
   },
   content: {
     padding: 16,
@@ -368,7 +368,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 10,
     paddingBottom: 7,
-    paddingTop: 3,
     backgroundColor: colors.background.primary,
 	borderBottomWidth: 5,
 	borderColor: colors.border.primary,

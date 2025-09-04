@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CalendarList } from 'react-native-calendars';
 import { Feather } from '@expo/vector-icons';
 import { colors, typography } from '../theme';
@@ -73,7 +73,7 @@ export default function CalendarScreen() {
 	}, [completedDatesSet]);
 
 	return (
-		<SafeAreaView style={styles.safeArea}>
+		<View style={styles.container}>
 			<View style={styles.header}> 
 				<TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
 				  <Feather name="x" size={20} color={colors.text.primary} />
@@ -105,19 +105,22 @@ export default function CalendarScreen() {
 				}}
 				style={styles.calendar}
 			/>
-		</SafeAreaView>
+		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	safeArea: { flex: 1, backgroundColor: colors.background.primary },
+	container: { 
+		flex: 1, 
+		backgroundColor: colors.background.primary,
+		paddingTop: 70,
+	},
     header: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
       paddingHorizontal: 10,
       paddingBottom: 12,
-      paddingTop: 3,
       backgroundColor: colors.background.primary,
 	  borderBottomWidth: 5,
 	  borderColor: colors.border.primary,

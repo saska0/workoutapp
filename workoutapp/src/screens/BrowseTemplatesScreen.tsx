@@ -6,6 +6,7 @@ import { RootStackParamList } from '../types/navigation';
 import { colors, typography } from '../theme';
 import { fetchSharedTemplates, copyTemplate } from '../api/templates';
 import MenuRow from '../components/MenuRow';
+import WideButton from '../components/WideButton';
 
  type Props = NativeStackScreenProps<RootStackParamList, 'BrowseTemplates'>;
 
@@ -148,12 +149,19 @@ export default function BrowseTemplatesScreen({ navigation }: Props) {
                 <Text style={styles.modalSubtitleInline}>  by {selectedWorkoutForMenu.ownerUsername}</Text>
               ) : null}
             </Text>
-            <TouchableOpacity style={styles.modalButton} onPress={handleCopy}>
-              <Text style={styles.modalButtonText}>Copy to My Workouts</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
+            <WideButton
+              title="Copy to My Workouts"
+              onPress={handleCopy}
+              backgroundColor={colors.button.dark}
+              textColor={colors.text.primary}
+            />
+            <WideButton
+              title="Cancel"
+              onPress={closeModal}
+              backgroundColor={colors.background.secondary}
+              textColor={colors.text.primary}
+              style={{ marginTop: 10 }}
+            />
           </TouchableOpacity>
         </TouchableOpacity>
       </Modal>
@@ -277,32 +285,5 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontSize: typography.fontSize.sm,
     fontWeight: typography.fontWeight.normal,
-  },
-  modalButton: {
-    backgroundColor: colors.button.dark,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginBottom: 6,
-  },
-  modalButtonText: {
-    color: colors.text.primary,
-    fontSize: typography.fontSize.md,
-    fontWeight: typography.fontWeight.semibold,
-    textAlign: 'center',
-  },
-  cancelButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.border.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 8,
-  },
-  cancelButtonText: {
-    color: colors.text.secondary,
-    fontSize: typography.fontSize.md,
-    textAlign: 'center',
   },
 });

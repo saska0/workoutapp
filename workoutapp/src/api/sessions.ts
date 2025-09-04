@@ -56,7 +56,14 @@ export async function getSessions(options?: GetSessionsOptions): Promise<Session
   });
 
   if (!response.ok) {
-    throw new Error('Failed to fetch sessions');
+    let errorMessage = 'Failed to fetch sessions';
+    try {
+      const errorData = await response.json();
+      errorMessage = errorData.error || errorData.message || errorMessage;
+    } catch {
+      errorMessage = response.statusText || errorMessage;
+    }
+    throw new Error(errorMessage);
   }
 
   return response.json();
